@@ -1,0 +1,2 @@
+gérer l'agencement global avec le main et tout 
+quand on enlève du contenu, ça se centre bizarrement.

@@ -1,11 +1,23 @@
+import Link from "next/link"
+
 export default function Navbar() {
   return (
-    <nav className="flex w-full m-auto bg-slate-50 p-4 border-md">
-      <a class="mx-2" href="#">AXORIA</a>
-      <a class="mx-2 mr-auto" href="#">Categories</a>
+    <nav className="w-full bg-slate-50 ">
+      <div className="max-w-6xl mx-auto flex py-4 px-12 ">
+        <Link class="mx-2" href="/">
+          AXORIA
+        </Link>
+        <Link class="mx-2 mr-auto" href="/articles">
+          Categories
+        </Link>
 
-      <a class="mx-2" href="#">Sign In</a>
-      <a class="mx-2" href="#">Sign Up</a>
+        <Link class="mx-2" href="/signin">
+          Sign In
+        </Link>
+        <Link class="mx-2" href="/signup">
+          Sign Up
+        </Link>
+      </div>
     </nav>
   )
 }

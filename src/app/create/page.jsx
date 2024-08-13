@@ -1,6 +1,6 @@
 export default function page() {
   return (
-    <>
+    <div className="bg-white p-7">
       <div className="flex mb-8">
         <h1 className="text-4xl">Create an article</h1>
         <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded ml-auto mr-4">
@@ -76,6 +76,6 @@ export default function page() {
           Submit
         </button>
       </form>
-    </>
+    </div>
   )
 }
