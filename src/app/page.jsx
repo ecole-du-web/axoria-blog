@@ -1,68 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
-const posts = [
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-]
+import { getPosts } from "@/lib/actions/dataActions";
 
-export default function Home() {
 
+
+export default async function Home() {
+  const posts = await getPosts()
   return (
     <div className="mt-24">
       <h1 className="text-3xl mb-2">Stay up to date with AXORIA.</h1>
       <p className="mb-12">Tech news and useful knowledge</p>
 
       {/* Peut-être une animation sur les boutons pour montrer où on est */}
-      <button className="mr-4 text-xl">Latest</button>
-      <button className="text-xl">Most Liked</button>
+      <p className="mr-4 text-xl">Latest articles</p>
       <div className="grid grid-cols-2 gap-4 mt-4 mb-12">
         {posts.map((post) => (
           <div>
@@ -70,7 +20,7 @@ export default function Home() {
             <div className="relative">
             </div>
             <p>{post.title}</p>
-            <p>{post.author}</p>
+            <p>{post.desc}</p>
             </Link>
           </div>
         ))}
