@@ -1,3 +1,5 @@
+import { addPost } from "@/lib/actions/actions"
+
 export default function page() {
   return (
     <div className="bg-white p-7">
@@ -10,22 +12,23 @@ export default function page() {
           Preview
         </button>
       </div>
-      <form>
+      <form action={addPost} >
         <label
           class="block text-gray-700 text-md font-semibold mb-2"
-          for="title"
+          htmlFor="title"
         >
           Title
         </label>
         <input
+          name="title"
           class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight mb-5 focus:outline-none focus:shadow-outline"
           id="title"
           type="text"
           placeholder="Title"
         />
-        <label
+        {/* <label
           class="block text-gray-700 text-md font-semibold mb-2"
-          for="title"
+          htmlFor="title"
         >
           Cover image
         </label>
@@ -34,13 +37,13 @@ export default function page() {
           id="title"
           type="file"
           placeholder="Title"
-        />
+        /> */}
 
-        <div className="flex mb-7">
+        {/* <div className="flex mb-7">
           <div>
             <label
               class="block text-gray-700 text-md font-semibold mb-2"
-              for="tag"
+              htmlFor="tag"
             >
               Add a tag(s)
             </label>
@@ -50,7 +53,6 @@ export default function page() {
               type="text"
               placeholder="Add a tag"
             />
-            {/* Hidden used input */}
             <input
               class="hidden"
               name="tags"
@@ -61,17 +63,21 @@ export default function page() {
           Add
         </button>
         <div class="self-end bg-white shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight  focus:outline-none focus:shadow-outline">Your tags ...</div>
-        </div>
+        </div> */}
 
         <label
           class="block text-gray-700 text-md font-semibold mb-2"
-          for="content"
+          htmlFor="content"
         >
           Write your article
         </label>
- 
-        <textarea name="content" id="content"  class="min-h-44 shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight mb-5 focus:outline-none focus:shadow-outline"></textarea>
-      
+
+        <textarea
+          name="desc"
+          id="content"
+          class="min-h-44 shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight mb-5 focus:outline-none focus:shadow-outline"
+        ></textarea>
+
         <button className="min-w-44 self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded border-none ">
           Submit
         </button>
