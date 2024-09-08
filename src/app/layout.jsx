@@ -13,7 +13,7 @@ export default function RootLayout({ children }) {
     <html lang="en" className="h-full">
       <body className="flex h-full flex-col">
         <Navbar />
-        <main className="grow w-full max-w-6xl m-auto  px-12 pb-44">
+        <main className="grow w-full max-w-6xl m-auto pt-20 px-12 pb-44">
           {children}
         </main>
         <Footer />

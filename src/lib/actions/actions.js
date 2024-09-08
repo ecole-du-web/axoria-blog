@@ -1,33 +1,54 @@
 "use server";
 import { connectToDB } from "../utils/utils";
 import { Post } from "../models/post";
+import { Tag } from "../models/tag";  // Importer correctement le modèle Tag
 import { revalidatePath } from "next/cache";
 // import { signIn, signOut } from "./auth"
 // import bcrypt from "bcryptjs"
 
 export const addPost = async (formData) => {
-  "use server" // ?
-  console.log("HALLO WORLD ICIC", formData)
-  // const title = formData.get("title")
-  // const desc = formData.get("desc")
-  // const slug = formData.get("slug")
-
-  const {title, desc} = Object.fromEntries(formData) 
-
-  // console.log(title, desc, slug, userId)
-
+  console.log("Received formData", formData);
+  
+  const { title, desc, tags } = Object.fromEntries(formData);  // Extraire les données du formulaire
+  
   try {
-    connectToDB()
+    // Connexion à la base de données
+    connectToDB();
+
+    // Gérer les tags : convertir la chaîne JSON en tableau
+    const tagNamesArray = JSON.parse(tags);  // Parse la chaîne de caractères en tableau ['css', 'javascript']
+    const tagIds = await Promise.all(tagNamesArray.map(tag => findOrCreateTag(tag)));  // Trouver ou créer chaque tag
+
+    // Créer le nouveau post avec les ObjectIds des tags
     const newPost = new Post({
-      title, desc
-    })
-    await newPost.save()
-    revalidatePath("/blog")
-  } catch(err) {
-    console.log(err)
+      title,
+      desc,
+      tags: tagIds  // Associer les ObjectIds des tags au post
+    });
+
+    // Sauvegarder le post dans la base de données
+    await newPost.save();
+
+    // Revalider le cache
+    revalidatePath("/blog");
+  } catch (err) {
+    console.log("Erreur lors de la création du post :", err);
+  }
+};
+
+const findOrCreateTag = async (tagName) => {
+  const normalizedTagName = tagName.trim().toLowerCase();  // Normaliser le tag
+  let tag = await Tag.findOne({ name: normalizedTagName });  // Rechercher le tag
+
+  if (!tag) {
+    tag = await Tag.create({ name: normalizedTagName });  // Créer le tag si non trouvé
   }
 
-}
+  return tag._id;  // Retourner l'ObjectId du tag
+};
+
+
+
 
 
 export const deletePost = async (formData) => {

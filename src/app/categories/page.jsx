@@ -55,8 +55,8 @@ const posts = [
 export default function page() {
   return (
     <>
-      <h1 className="text-3xl mb-2">Category : JavaScript</h1>
-      <p className="mb-12">All articles related to this tag.</p>
+      <h1 className="text-3xl mb-2">All categories</h1>
+      <p className="mb-12">Find articles sorted by category tag.</p>
 
       {/* Peut-être une animation sur les boutons pour montrer où on est */}
       <button className="mr-4 text-xl">Latest</button>
@@ -64,11 +64,8 @@ export default function page() {
       <div className="grid grid-cols-3 gap-4 mt-4 mb-12">
         {posts.map((post) => (
           <div>
-            <div className="relative">
-              {/* Animation de coeur à rajouter ? */}
-            </div>
-            <p>{post.title}</p>
-            <p>{post.author}</p>
+            <p>JavaScript</p>
+            <p>Nombre d'articles : 99</p>
           </div>
         ))}
       </div>

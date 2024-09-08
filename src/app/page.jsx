@@ -6,8 +6,10 @@ import { getPosts } from "@/lib/actions/dataActions";
 
 export default async function Home() {
   const posts = await getPosts()
+  console.log(posts);
+  
   return (
-    <div className="mt-24">
+    <div>
       <h1 className="text-3xl mb-2">Stay up to date with AXORIA.</h1>
       <p className="mb-12">Tech news and useful knowledge</p>
 
@@ -15,10 +17,12 @@ export default async function Home() {
       <p className="mr-4 text-xl">Latest articles</p>
       <div className="grid grid-cols-2 gap-4 mt-4 mb-12">
         {posts.map((post) => (
-          <div>
-            <Link href="/articles/test">
-            <div className="relative">
-            </div>
+          <div className="border-4">
+            <Link 
+            href={`/article/${post.slug}`}
+            // block pour faire fonctionner le padding
+            className="block p-5"
+            >
             <p>{post.title}</p>
             <p>{post.desc}</p>
             </Link>

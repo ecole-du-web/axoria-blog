@@ -2,3 +2,14 @@ gérer l'agencement global avec le main et tout
 quand on enlève du contenu, ça se centre bizarrement.
 
 revoir le nom des actions etc, le nom des dossiers aussi
+
+rajouter les tags 
+
+faire un back office / dashboard pour gérer ses articles
+
+
+pourquoi on async les fonctions qui utilise les server actions et surtout quelle est la répercussion au niveau de node
+
+
+valider le nom des tgas en minus sans space front&back ?
+

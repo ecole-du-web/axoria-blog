@@ -18,6 +18,10 @@ const postSchema = new mongoose.Schema(
     //   type: String,
     //   required: true,
     // },
+    tags: [{
+      type: mongoose.Schema.Types.ObjectId,  // Référence aux ObjectId des tags
+      ref: 'Tag'                             // Référence au modèle Tag
+    }],
     slug: {
       type: String,
       unique: true,
