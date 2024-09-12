@@ -11,13 +11,14 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // img: {
-    //   type: String,
-    // },
-    // userId: {
-    //   type: String,
-    //   required: true,
-    // },
+    coverImageUrl: {
+      type: String,  // URL de l'image originale
+      required: true,  // Vous pouvez le rendre facultatif selon vos besoins
+    },
+    thumbnailUrl: {
+      type: String,  // URL de la version redimensionnée (thumbnail)
+      required: true,  // Vous pouvez également le rendre facultatif
+    },
     tags: [{
       type: mongoose.Schema.Types.ObjectId,  // Référence aux ObjectId des tags
       ref: 'Tag'                             // Référence au modèle Tag

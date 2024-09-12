@@ -7,44 +7,57 @@ import { revalidatePath } from "next/cache";
 // import bcrypt from "bcryptjs"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/utils/firebase"; // Importer Firebase Storage
+import sharp from "sharp"
 
 
 export const addPost = async (formData) => {
-  console.log("Received formData", formData);
-  
-  const { title, desc, tags } = Object.fromEntries(formData);  // Extraire les données du formulaire
-  
+  const { title, desc, tags } = Object.fromEntries(formData);
   try {
     // Connexion à la base de données
     connectToDB();
 
     // 1. Gérer l'upload de l'image
     const imageFile = formData.get("coverImage");
-    let imageUrl = "";
+    let originalImageUrl = "";
+    let thumbnailUrl = "";
 
     if (imageFile && imageFile.size > 0) {
       try {
-        const imageRef = ref(storage, `images/${imageFile.name}`);
-        const snapshot = await uploadBytes(imageRef, imageFile);
-        imageUrl = await getDownloadURL(snapshot.ref);  // Récupérer l'URL publique de l'image
-        console.log("Image uploaded successfully:", imageUrl);
+        const imageBuffer = Buffer.from(await imageFile.arrayBuffer());
+
+        // Sauvegarder l'image originale
+        const originalImageRef = ref(storage, `images/originals/${imageFile.name}`);
+        const originalSnapshot = await uploadBytes(originalImageRef, imageBuffer);
+        originalImageUrl = await getDownloadURL(originalSnapshot.ref);
+
+        // Créer une version réduite (thumbnail) avec sharp
+        const thumbnailBuffer = await sharp(imageBuffer)
+          .resize(320, 180) // Redimensionner à 320x180
+          .toBuffer();
+
+        // Sauvegarder l'image redimensionnée (thumbnail)
+        const thumbnailImageRef = ref(storage, `images/thumbnails/${imageFile.name}`);
+        const thumbnailSnapshot = await uploadBytes(thumbnailImageRef, thumbnailBuffer);
+        thumbnailUrl = await getDownloadURL(thumbnailSnapshot.ref);
+
+        console.log("Images uploaded successfully:", originalImageUrl, thumbnailUrl);
       } catch (uploadError) {
         console.error("Erreur lors de l'upload de l'image :", uploadError);
         throw new Error("Image upload failed.");
       }
     }
 
-
-
     // Gérer les tags : convertir la chaîne JSON en tableau
-    const tagNamesArray = JSON.parse(tags);  // Parse la chaîne de caractères en tableau ['css', 'javascript']
-    const tagIds = await Promise.all(tagNamesArray.map(tag => findOrCreateTag(tag)));  // Trouver ou créer chaque tag
+    const tagNamesArray = JSON.parse(tags);  
+    const tagIds = await Promise.all(tagNamesArray.map(tag => findOrCreateTag(tag)));
 
-    // Créer le nouveau post avec les ObjectIds des tags
+    // Créer le nouveau post avec les ObjectIds des tags et les URLs des images
     const newPost = new Post({
       title,
       desc,
-      tags: tagIds  // Associer les ObjectIds des tags au post
+      tags: tagIds,
+      coverImageUrl: originalImageUrl, // L'URL de l'image d'origine
+      thumbnailUrl // L'URL de la version redimensionnée
     });
 
     // Sauvegarder le post dans la base de données
@@ -56,6 +69,9 @@ export const addPost = async (formData) => {
     console.log("Erreur lors de la création du post :", err);
   }
 };
+
+
+
 
 const findOrCreateTag = async (tagName) => {
   const normalizedTagName = tagName.trim().toLowerCase();  // Normaliser le tag

@@ -23,6 +23,7 @@ export default async function Home() {
             // block pour faire fonctionner le padding
             className="block p-5"
             >
+              <img src={post.thumbnailUrl} alt="" />
             <p>{post.title}</p>
             <p>{post.desc}</p>
             </Link>

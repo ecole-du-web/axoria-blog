@@ -9,6 +9,7 @@ export default async function page({params}) {
   
   return (
     <div className="pt-24">
+      <img src={post.coverImageUrl} alt="" />
       <h1 className="text-3xl mb-2">{post.title}</h1>
       <p className="mb-12">Tech news and useful knowledge.</p>
       <p className="">{post.desc}.</p>

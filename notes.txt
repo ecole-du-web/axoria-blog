@@ -19,3 +19,10 @@ Ex juste du code logique métier dans un composant ?
 
 
 gérer les potentielles erreurs et afficher "post créé/modifié/supprimé" avec succès.
+
+
+afficher du markdown
+gérer l'auth 
+gérer l'affichage d'une navbar pour les connectés et sans doute des features comme des boutons pour modifier / supprimer les articles 
+gérer la suppresion et maj 
+sans doute autre choses
