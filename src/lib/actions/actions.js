@@ -5,6 +5,9 @@ import { Tag } from "../models/tag";  // Importer correctement le modèle Tag
 import { revalidatePath } from "next/cache";
 // import { signIn, signOut } from "./auth"
 // import bcrypt from "bcryptjs"
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "@/lib/utils/firebase"; // Importer Firebase Storage
+
 
 export const addPost = async (formData) => {
   console.log("Received formData", formData);
@@ -14,6 +17,24 @@ export const addPost = async (formData) => {
   try {
     // Connexion à la base de données
     connectToDB();
+
+    // 1. Gérer l'upload de l'image
+    const imageFile = formData.get("coverImage");
+    let imageUrl = "";
+
+    if (imageFile && imageFile.size > 0) {
+      try {
+        const imageRef = ref(storage, `images/${imageFile.name}`);
+        const snapshot = await uploadBytes(imageRef, imageFile);
+        imageUrl = await getDownloadURL(snapshot.ref);  // Récupérer l'URL publique de l'image
+        console.log("Image uploaded successfully:", imageUrl);
+      } catch (uploadError) {
+        console.error("Erreur lors de l'upload de l'image :", uploadError);
+        throw new Error("Image upload failed.");
+      }
+    }
+
+
 
     // Gérer les tags : convertir la chaîne JSON en tableau
     const tagNamesArray = JSON.parse(tags);  // Parse la chaîne de caractères en tableau ['css', 'javascript']

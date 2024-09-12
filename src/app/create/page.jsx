@@ -60,18 +60,20 @@ export default function page() {
           type="text"
           placeholder="Title"
         />
-        {/* <label
+
+        <label
           className="block text-gray-700 text-md font-semibold mb-2"
-          htmlFor="title"
+          htmlFor="coverImage"
         >
           Cover image
         </label>
         <input
+          name="coverImage"
           className="shadow cursor-pointer border rounded w-full py-3 px-3 bg-white text-gray-700 leading-tight mb-5 focus:outline-none focus:shadow-outline"
-          id="title"
+          id="coverImage"
           type="file"
-          placeholder="Title"
-        /> */}
+          placeholder="Bannière de votre article"
+        />
 
         <div className="mb-7">
           <label

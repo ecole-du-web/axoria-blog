@@ -13,3 +13,9 @@ pourquoi on async les fonctions qui utilise les server actions et surtout quelle
 
 valider le nom des tgas en minus sans space front&back ?
 
+
+est ce que next comprendrait un fonctionnement sans actions ? 
+Ex juste du code logique métier dans un composant ?
+
+
+gérer les potentielles erreurs et afficher "post créé/modifié/supprimé" avec succès.
