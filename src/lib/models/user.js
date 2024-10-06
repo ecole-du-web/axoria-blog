@@ -1,34 +1,11 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
-  {
-    username: {
-      type: String,
-      required: true,
-      unique: true,
-      min: 3,
-      max: 20,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      max: 50,
-    },
-    password: {
-      type: String,
-    },
-    img: {
-      type: String,
-    },
-    isAdmin: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  { timestamps: true }
-);
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  isAdmin: { type: Boolean, default: false },
+});
 
-// Si le modèle User existe déjà dans mongoose.models, alors User sera égal à ce modèle existant.
-// Si le modèle User n'existe pas encore, il sera créé en utilisant mongoose.model("User", userSchema).
+// Réutilise le modèle si déjà défini, sinon crée-le, check pourquoi il faut ce ? à tout prix.
 export const User = mongoose.models?.User || mongoose.model("User", userSchema);

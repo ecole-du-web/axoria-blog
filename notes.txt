@@ -26,3 +26,12 @@ gérer l'auth
 gérer l'affichage d'une navbar pour les connectés et sans doute des features comme des boutons pour modifier / supprimer les articles 
 gérer la suppresion et maj 
 sans doute autre choses
+
+
+redimensionner les images si nécessaire côté client au moment du submit
+
+
+compresser aussi les images côté serveur ? à mon avis c'est simple 
+
+
+faire des composants Tailwind ?

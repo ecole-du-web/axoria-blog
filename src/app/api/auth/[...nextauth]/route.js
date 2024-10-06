@@ -1,0 +1,1 @@
+// export { GET, POST } from "../../../../lib/actions/auth/auth.js" // useless here

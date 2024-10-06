@@ -2,8 +2,9 @@
 import { useState, useRef } from "react"
 import { addPost } from "@/lib/actions/actions"
 
-export default function page() {
+export default function Page() {
   const [tags, setTags] = useState([])
+
   const tagInputRef = useRef(null) // Utilisation d'une ref
 
   function handleAddTag(e) {
@@ -23,11 +24,35 @@ export default function page() {
     e.preventDefault()
     const formData = new FormData(e.target)
     formData.set("tags", JSON.stringify(tags)) // Ajoute les tags au formData
-    console.log(formData);
+
+
+    console.log(formData)
     for (let [key, value] of formData.entries()) {
-      console.log(key, value);
+      console.log(key, value)
     }
+
     addPost(formData) // Appelle la fonction `addPost` avec les données du formulaire
+  }
+
+  function handleFileChange(e) {
+    const file = e.target.files[0]
+    const fileType = file.type
+    const validImageTypes = ["image/jpeg", "image/png", "image/webp"]
+
+    // Vérifie si le fichier est de type image
+    if (!validImageTypes.includes(fileType)) {
+      alert("Please upload a valid image (JPEG, PNG, or WebP).")
+      e.target.value = "" // Réinitialise l'input de fichier
+      return
+    }
+
+    // Vérifie si la taille du fichier dépasse 4 Mo
+    const maxSize = 4 * 1024 * 1024 // 4 Mo en octets
+    if (file.size > maxSize) {
+      alert("File size exceeds 4MB, please upload a smaller file.")
+      e.target.value = "" // Réinitialise l'input de fichier
+      return
+    }
   }
 
   return (
@@ -53,7 +78,7 @@ export default function page() {
           Title
         </label>
         <input
-        required
+          required
           name="title"
           className="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight mb-5 focus:outline-none focus:shadow-outline"
           id="title"
@@ -73,6 +98,7 @@ export default function page() {
           id="coverImage"
           type="file"
           placeholder="Bannière de votre article"
+          onChange={handleFileChange} // Gestion de l'upload et du redimensionnement
         />
 
         <div className="mb-7">
@@ -83,14 +109,13 @@ export default function page() {
             Add a tag(s)
           </label>
           <div className="flex">
-          <input
-          
-            className="shadow appearance-none border rounded  py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="tag"
-            type="text"
-            placeholder="Add a tag"
-            ref={tagInputRef}
-          />
+            <input
+              className="shadow appearance-none border rounded  py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="tag"
+              type="text"
+              placeholder="Add a tag"
+              ref={tagInputRef}
+            />
             <button
               className=" bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded ml-4 mr-4 border-none"
               onClick={handleAddTag}
@@ -125,7 +150,7 @@ export default function page() {
         </label>
 
         <textarea
-        required
+          required
           name="desc"
           id="content"
           className="min-h-44 shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight mb-5 focus:outline-none focus:shadow-outline"
