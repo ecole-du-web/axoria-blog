@@ -16,7 +16,7 @@ export default async function Home() {
       {/* Peut-être une animation sur les boutons pour montrer où on est */}
       <p className="mr-4 text-xl">Latest articles</p>
       <div className="grid grid-cols-2 gap-4 mt-4 mb-12">
-        {posts.map((post) => (
+        {/* {posts.map((post) => (
           <div className="border-4">
             <Link 
             href={`/article/${post.slug}`}
@@ -28,7 +28,7 @@ export default async function Home() {
             <p>{post.desc}</p>
             </Link>
           </div>
-        ))}
+        ))} */}
       </div>
       {posts.length > 9 && <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded w-fit block mx-auto">Load more</button>}
     </div>

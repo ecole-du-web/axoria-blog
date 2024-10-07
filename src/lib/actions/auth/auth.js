@@ -1,23 +1,43 @@
-// lib/auth.js
-import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { login, signup } from "./auth.methods";  // Import des méthodes
-import { authConfig } from "./auth.config";  // Import de la config des routes
+import NextAuth from "next-auth"
+import CredentialsProvider from "next-auth/providers/credentials"
+import { connectToDB } from "@/lib/utils/utils"
+import { User } from "@/lib/models/user"
+import bcrypt from "bcryptjs"
+import { authConfig } from "./auth.config"
 
-// Configuration de NextAuth
-const nextAuthOptions = {
-  ...authConfig,
+const login = async (credentials) => {
+  try {
+    connectToDB();
+    const user = await User.findOne({ username: credentials.username });
+
+    if (!user) throw new Error("Wrong credentials!");
+
+    const isPasswordCorrect = await bcrypt.compare(
+      credentials.password,
+      user.password
+    );
+
+    if (!isPasswordCorrect) throw new Error("Wrong credentials!");
+
+    return user;
+  } catch (err) {
+    console.log(err);
+    throw new Error("Failed to login!");
+  }
+};
+
+export const { handlers: {GET,POST}, auth, signIn, signOut } = NextAuth({
+  // ...authConfig,
   providers: [
     CredentialsProvider({
       async authorize(credentials) {
-        // Utilise la méthode login pour authentifier l'utilisateur
-        return await login(credentials);
+        try {
+          const user = await login(credentials);
+          return user;
+        } catch (err) {
+          return null;
+        }
       },
     }),
   ],
-  callbacks: {
-    ...authConfig.callbacks,
-  },
-};
-
-export default nextAuthOptions;
+})
