@@ -5,6 +5,7 @@ import Dropdown from "./Dropdown/Dropdown"
 
 export default async function Navbar() {
   const session = await auth()
+  console.log("SESSION", session)
 
   return (
     <nav className="w-full bg-slate-50 ">
@@ -15,7 +16,11 @@ export default async function Navbar() {
         <Link className="mx-2 mr-auto" href="/categories">
           Categories
         </Link>
-
+        {session?.user && (
+          <Link className="mx-2" href="/create">
+            Add an article
+          </Link>
+        )}
         <div>
           {session?.user ? (
             <Dropdown />

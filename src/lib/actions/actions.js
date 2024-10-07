@@ -8,13 +8,24 @@ import { revalidatePath } from "next/cache";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/utils/firebase"; // Importer Firebase Storage
 import sharp from "sharp"
-
+// Récupère le cookie et les données de session
+import { auth } from "./auth/auth";
 
 export const addPost = async (formData) => {
   const { title, desc, tags } = Object.fromEntries(formData);
   try {
     // Connexion à la base de données
     connectToDB();
+
+      // Récupérer la session pour obtenir l'ID de l'utilisateur connecté
+      const session = await auth();
+      console.log("SESSSSSSSSSSSSSSSSSSSSSSSSION", session)
+      const userId = session?.user?.id;  // Associer l'ID utilisateur
+  
+      if (!userId) {
+        throw new Error("Utilisateur non authentifié");
+      }
+
 
     // 1. Gérer l'upload de l'image
     const imageFile = formData.get("coverImage");
@@ -57,11 +68,14 @@ export const addPost = async (formData) => {
       desc,
       tags: tagIds,
       coverImageUrl: originalImageUrl, // L'URL de l'image d'origine
-      thumbnailUrl // L'URL de la version redimensionnée
+      thumbnailUrl, // L'URL de la version redimensionnée
+      author: userId,  // Associer l'article à l'utilisateur connecté
+
     });
 
     // Sauvegarder le post dans la base de données
-    await newPost.save();
+    const savedPost  = await newPost.save();
+    console.log("Post sauvegardé avec succès :", savedPost); // Vérifie si `author` est bien sauvegardé
 
     // Revalider le cache
     revalidatePath("/blog");

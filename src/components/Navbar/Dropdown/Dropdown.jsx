@@ -29,7 +29,7 @@ export default function Dropdown() {
           height={24}
         />
       </button>
-      <div ref={dropdown} className="absolute right-0 top-10 w-[250px]">
+      <div ref={dropdown} className="hidden absolute right-0 top-10 w-[250px]">
         <div className="bg-red-600">
           {/* ib pour le p-t */}
         <Link className="inline-block p-4" href="/">

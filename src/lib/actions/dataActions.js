@@ -7,7 +7,7 @@ export const getPosts = async () => {
   try {
     await connectToDB();
     const posts = await Post.find();
-    console.log(posts)
+    // console.log(posts)
     return posts;
   } catch (err) {
     console.log(err);

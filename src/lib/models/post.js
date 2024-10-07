@@ -27,6 +27,11 @@ const postSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
+    author: {
+      type: mongoose.Schema.Types.ObjectId,  // Référence à l'utilisateur
+      ref: "User",  // Le modèle auquel l'ID fait référence
+      required: true,
+    },
   },
   { timestamps: true }
 );

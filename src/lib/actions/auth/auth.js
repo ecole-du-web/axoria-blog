@@ -26,7 +26,7 @@ const authenticateUser = async (credentials) => {
   }
 };
 
-export const { handlers: {GET,POST}, auth, signIn, signOut } = NextAuth({
+export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
   // ...authConfig,
   providers: [
     CredentialsProvider({
@@ -40,4 +40,12 @@ export const { handlers: {GET,POST}, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    // Ajouter l'ID utilisateur à la session sans utiliser de JWT
+    async session({ session, user }) {
+      const dbUser = await User.findOne({ email: session.user.email });
+      session.user.id = dbUser._id; // Ajouter l'ID MongoDB de l'utilisateur à la session
+      return session;
+    },
+  },
 })
