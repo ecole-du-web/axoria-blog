@@ -35,3 +35,6 @@ compresser aussi les images côté serveur ? à mon avis c'est simple
 
 
 faire des composants Tailwind ?
+
+
+proteger ses icones dans /public ? au cas où hotlinking ?

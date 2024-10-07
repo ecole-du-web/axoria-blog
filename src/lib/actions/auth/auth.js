@@ -5,7 +5,7 @@ import { User } from "@/lib/models/user"
 import bcrypt from "bcryptjs"
 import { authConfig } from "./auth.config"
 
-const login = async (credentials) => {
+const authenticateUser = async (credentials) => {
   try {
     connectToDB();
     const user = await User.findOne({ username: credentials.username });
@@ -32,7 +32,7 @@ export const { handlers: {GET,POST}, auth, signIn, signOut } = NextAuth({
     CredentialsProvider({
       async authorize(credentials) {
         try {
-          const user = await login(credentials);
+          const user = await authenticateUser(credentials);
           return user;
         } catch (err) {
           return null;
