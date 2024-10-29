@@ -6,10 +6,15 @@ const postSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      unique: true
     },
     desc: {
       type: String,
       required: true,
+    },
+    markdown: { 
+      type: String, 
+      required: true 
     },
     coverImageUrl: {
       type: String,  // URL de l'image originale
@@ -36,6 +41,7 @@ const postSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Slug à changer quand on modifie un article ?
 postSchema.pre("save", async function (next) {
   if (!this.slug) {
     let slugCandidate = slugify(this.title, { lower: true, strict: true });

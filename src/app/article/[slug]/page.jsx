@@ -1,18 +1,24 @@
 import Image from "next/image"
 import { getPost } from "@/lib/actions/dataActions"
 
-export default async function page({params}) {
-  const {slug} = params
+import HighlightedCode from "./HighlightedCode"
+
+export default async function page({ params }) {
+  const { slug } = params
   const post = await getPost(slug)
-  console.log("POST RECU", post);
-  
-  
+  console.log("ARTICLE", post)
+
   return (
     <div className="pt-24">
-      <img src={post.coverImageUrl} alt="" />
+      <img src={post.coverImageUrl} alt={post.title} />
       <h1 className="text-3xl mb-2">{post.title}</h1>
-      <p className="mb-12">Tech news and useful knowledge.</p>
-      <p className="">{post.desc}.</p>
+      <h1>
+        {post.tags.map(tag => (
+          <p>{tag.name}</p>
+        ))}
+      </h1>
+      {/* Affichage sécurisé du HTML */}
+      <HighlightedCode desc={post.desc} />
     </div>
   )
 }

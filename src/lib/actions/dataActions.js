@@ -1,7 +1,12 @@
+"use server"
 import { Post } from "../models/post";
 import { User } from "../models/user";
 import { connectToDB } from "../utils/utils";
 import { unstable_noStore as noStore } from "next/cache";
+import { auth } from "./auth/auth";
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
+import { Tag } from "../models/tag";
 
 export const getPosts = async () => {
   try {
@@ -16,21 +21,38 @@ export const getPosts = async () => {
 };
 
 export const getPost = async (slug) => {
-  // Pour ne pas cacher les données par défaut (changements fréquents)
-  // noStore()
   try {
     await connectToDB();
     console.log(`Fetching post with slug: ${slug}`);
-    const post = await Post.findOne({ slug });
-    console.log("Post retrieved:", post);
-    return post;
+    
+    // Récupérer l'objet Mongoose
+    // Il faut import Tag quand on populate
+    // select s'applique au modèle principal ici POST, et populate aux documents d'un autre modèle lié.
+    // Ex : const post = await Post.findOne({ slug })
+    // .select("title content")  // Champs du modèle Post
+    // .populate("tags", "name description"); // Champs du modèle Tag
+    const post = await Post.findOne({ slug }).populate("tags", "name");
+    if (!post) return null;
+    
+    // Convertir l'objet en un objet simple
+    const plainPost = post.toObject();
+    // Conversion explicite des champs nécessaires
+    return {
+      ...plainPost,
+      author:  post.author.name, // Exemple: inclure seulement le nom de l'auteur car sinon bug not plain object
+
+      _id: plainPost._id.toString(), // Convertir ObjectId en chaîne
+      tags: plainPost.tags.map(tag => ( // On ne garde que le nom qui est unique, pas besoin de prendre l'_id implicitement retourné par populate.
+        tag.name           // Nom du tag
+      )), // Convertir chaque tag ObjectId en chaîne
+      createdAt: plainPost.createdAt.toISOString(), // Convertir date en chaîne ISO
+      updatedAt: plainPost.updatedAt.toISOString(), // Convertir date en chaîne ISO
+    };
   } catch (err) {
     console.error("Error fetching post:", err);
     throw new Error("Failed to fetch post!");
   }
 };
-
-
 
 export const getUser = async (id) => {
   noStore();
@@ -56,8 +78,45 @@ export const getUsers = async () => {
 };
 
 
+export const getUserPosts = async () => {
+  try {
+    // Connexion à la base de données
+    await connectToDB();
 
+    // Récupérer la session pour obtenir l'ID de l'utilisateur connecté
+    const session = await auth(); 
+    const userId = session?.user?.id;  // Récupérer l'ID de l'utilisateur connecté
 
+    if (!userId) {
+      throw new Error("Utilisateur non authentifié");
+    }
+
+    // Rechercher tous les articles créés par cet utilisateur
+    const posts = await Post.find({ author: userId }).select("title _id slug");
+
+    return posts;  // Retourner les articles filtrés par l'utilisateur
+  } catch (err) {
+    console.log(err);
+    throw new Error("Failed to fetch user posts!");
+  }
+};
+
+export const deletePost = async (formData) => {
+  const { id } = Object.fromEntries(formData);
+  
+  try {
+    await connectToDB();
+
+    await Post.findByIdAndDelete(id);
+    console.log("deleted from db");
+    // à voir mais mets à jour automatiquement meme si on est sur la pge, plus pratique qu'un redirect mais trop documenté.
+    revalidatePath("/dashboard");
+    // redirect("/dashboard");
+  } catch (err) {
+    console.log(err);
+    return { error: "Something went wrong!" };
+  }
+};
 
 // SANS DB
 
