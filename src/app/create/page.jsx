@@ -1,11 +1,15 @@
 "use client"
 import { useState, useRef } from "react"
 import { addPost } from "@/lib/actions/actions"
-
+import { useRouter } from 'next/navigation'
+ 
 export default function Page() {
   const [tags, setTags] = useState([])
+  const router = useRouter()
 
   const tagInputRef = useRef(null) // Utilisation d'une ref
+  const submitButtonRef = useRef(null)
+  const serverValidationText = useRef(null)
 
   function handleAddTag(e) {
     e.preventDefault()
@@ -20,7 +24,7 @@ export default function Page() {
     setTags(tags.filter(tag => tag !== tagToRemove))
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     const formData = new FormData(e.target)
     formData.set("tags", JSON.stringify(tags)) // Ajoute les tags au formData
@@ -31,7 +35,27 @@ export default function Page() {
       console.log(key, value)
     }
 
-    addPost(formData) // Appelle la fonction `addPost` avec les données du formulaire
+    submitButtonRef.current.textContent = "Saving Post..."
+    const result = await addPost(formData); 
+
+    if (result.success) {
+      submitButtonRef.current.textContent = "Post Saved ✅"
+      // Optionnel : redirection ou affichage de succès ici
+      let countdown = 3; // Le nombre de secondes avant redirection
+      serverValidationText.current.textContent = `Redirecting in ${countdown}...`;
+      const interval = setInterval(() => {
+        countdown -= 1;
+        serverValidationText.current.textContent = `Redirecting in ${countdown}...`;
+        
+        if (countdown === 0) {
+          clearInterval(interval); // Arrête l'intervalle
+          router.push(`/article/${result.slug}`); // Redirige
+        }
+      }, 1000); // Met à jour toutes les secondes (1000 ms)
+    } else {      
+      submitButtonRef.current.textContent = "Submit"
+      serverValidationText.current.textContent = `Error while uploading the post. Please try again or contact the site team.`;
+  }
   }
 
   function handleFileChange(e) {
@@ -156,9 +180,10 @@ export default function Page() {
           className="min-h-44 shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight mb-5 focus:outline-none focus:shadow-outline"
         ></textarea>
 
-        <button className="min-w-44 self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded border-none ">
+        <button ref={submitButtonRef} className="min-w-44 self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold mb-4 py-3 px-4 rounded border-none ">
           Submit
         </button>
+        <p ref={serverValidationText} className="text-xl">Test</p>
       </form>
     </div>
   )

@@ -98,10 +98,10 @@ export const addPost = async (formData) => {
     // Sauvegarder le post dans la base de données
     const savedPost = await newPost.save();
     console.log("Post sauvegardé avec succès :", savedPost); // Vérifie si `author` est bien sauvegardé
-
     // Revalider le cache
     revalidatePath("/blog");
     revalidatePath("/dashboard");
+    return { success: true, slug: savedPost.slug }; 
   } catch (err) {
     console.log("Erreur lors de la création du post :", err);
   }
