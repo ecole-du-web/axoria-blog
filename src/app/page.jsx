@@ -1,46 +1,26 @@
-import Image from "next/image"
-import Link from "next/link"
-import { getPosts } from "@/lib/actions/dataActions"
+import { getPosts } from "@/lib/serverActions/dataActions"
+import BlogCard from "@/components/BlogCard"
 
 export default async function Home() {
   const posts = await getPosts()
-  // console.log(posts);
+  console.log(posts)
+  console.log(JSON.stringify(posts, null, 2))
 
+  
   return (
-    <div>
-      <h1 className="text-3xl mb-2">Stay up to date with AXORIA.</h1>
-      <p className="mb-12">Tech news and useful knowledge</p>
-      
-      
-      <div>
-      
-<div>
+    <div className="u-main-container u-padding-content-container">
+      <h1 className="u-main-title">
+        Stay up to date with AXORIA.
+      </h1>
+      <p className="u-main-subtitle">Tech news and useful knowledge</p>
 
-
-</div>
-      </div>
       {/* Peut-être une animation sur les boutons pour montrer où on est */}
-      <p className="mr-4 text-xl">Latest articles</p>
-      <div className="grid grid-cols-2 gap-4 mt-4 mb-12">
+      <p className="mr-4 text-md text-zinc-900">Latest articles</p>
+      <div className="grid grid-cols-3 gap-x-4 gap-y-8 mt-4 mb-12">
         {posts.map(post => (
-          <div className="border-4">
-            <Link
-              href={`/article/${post.slug}`}
-              // block pour faire fonctionner le padding
-              className="block p-5"
-            >
-              <img src={post.thumbnailUrl} alt="" />
-              <p>{post.title}</p>
-              <p>{post.desc}</p>
-            </Link>
-          </div>
+          <BlogCard key={new Date()} post={post} />
         ))}
       </div>
-      {posts.length > 9 && (
-        <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded w-fit block mx-auto">
-          Load more
-        </button>
-      )}
     </div>
   )
 }

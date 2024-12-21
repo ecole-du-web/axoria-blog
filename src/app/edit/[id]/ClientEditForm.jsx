@@ -1,7 +1,7 @@
 "use client"
 import { useState, useRef, useEffect } from "react"
 import { useParams } from "next/navigation"; // Importer useParams depuis next/navigation
-import { editPost } from "@/lib/actions/actions";
+import { editPost } from "@/lib/serverActions/actions";
 export default function Page({post}) {
   console.log("CLIENT EDIT", post);
   
@@ -66,16 +66,8 @@ export default function Page({post}) {
   }
 
   return (
-    <div className="bg-white p-7">
-      <div className="flex mb-8">
-        <h1 className="text-4xl">Edit your post</h1>
-        <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded ml-auto mr-4">
-          Edit
-        </button>
-        <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded">
-          Preview
-        </button>
-      </div>
+    <div className="bg-white p-7 mt-12">
+  
 
       {/* 
       si on veut juste envoyer un simple post sans tags

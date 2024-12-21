@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import slugify from "slugify";
+import { User } from "./user";
 
 const postSchema = new mongoose.Schema(
   {

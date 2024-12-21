@@ -1,56 +1,69 @@
-"use client" // ??? DEFAULT ?
-import { login } from "@/lib/actions/auth/auth.methods"
+"use client"
+// import { login } from "@/lib/actions/auth/auth.methods"
+import { login } from "@/lib/serverActions/session/sessionMethods"
 import { useRouter } from "next/navigation"
+import { useRef } from "react"
 
-export default function page() {
+export default function Page() {
   const router = useRouter()
+  const serverErrorRef = useRef()
+
   const handleSubmit = async e => {
-    e.preventDefault()
-    // errorRef.current.textContent = ''; // Reset error message
-
-    const result = await login(new FormData(e.target))
-
-    if (result.error) {
-      // errorRef.current.textContent = result.error;
-    } else if (result.success) {
-      console.log("SUCCES", result)
-
-      router.push("/") // Redirection en cas de succès
+    e.preventDefault();
+  
+    const formData = new FormData(e.target); // Récupère les données du formulaire
+    
+    try {
+      const result = await login(formData);
+  
+      if (result?.errorMsg) {
+        serverErrorRef.current.textContent = result.errorMsg;
+      } else {
+        router.push("/"); // Redirige vers la page d'accueil si succès
+      }
+    } catch (err) {
+      console.error("Error during login:", err);
+      serverErrorRef.current.textContent = "An unexpected error occurred.";
     }
-  }
+  };
+  
+
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-20">
       <label
-        class="block text-gray-700 text-md font-semibold mb-2"
-        for="username"
+        className="block text-gray-700 text-md font-semibold mb-2"
+        htmlFor="userName"
       >
-        Pseudo + email à faire
+        Your pseudo or email
       </label>
       <input
-        class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight mb-5 focus:outline-none focus:shadow-outline"
-        id="username"
+        className="shadow appearance-none border rounded w-full py-3 px-3 mb-5 text-gray-700 leading-tight  focus:outline-none focus:shadow-outline"
+        id="userName"
         type="text"
-        name="username"
+        name="userName"
+        required
         placeholder="Name or pseudo"
       />
 
       <label
-        class="block text-gray-700 text-md font-semibold mb-2"
-        for="password"
+        className="block text-gray-700 text-md font-semibold mb-2"
+        htmlFor="password"
       >
-        Password
+        Your password
       </label>
       <input
-        class="mb-10 shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        className=" shadow appearance-none border rounded w-full py-3 px-3 mb-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         id="password"
         type="password"
         name="password"
+        required
         placeholder="Your password"
       />
 
-      <button className="w-full self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded border-none ">
+      <button className="w-full self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 mb-3 rounded border-none ">
         Submit
       </button>
+      <p ref={serverErrorRef} className="text-red-600 mt-2"></p>
     </form>
   )
 }

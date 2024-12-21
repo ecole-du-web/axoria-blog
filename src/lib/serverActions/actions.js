@@ -1,5 +1,5 @@
 "use server";
-import { connectToDB } from "../utils/utils";
+import { connectToDB } from "../utils/connectToDB";
 import { Post } from "../models/post";
 import { Tag } from "../models/tag";  // Importer correctement le modèle Tag
 import { revalidatePath } from "next/cache";
@@ -18,7 +18,7 @@ import { getPost } from "./dataActions";
 import { JSDOM } from 'jsdom';
 import createDOMPurify from 'dompurify';
 import mongoose from "mongoose";
-
+import { sessionInfo } from "../server/session/sessionMethods";
 
 // Créer un DOM simulé pour DOMPurify côté serveur
 const window = new JSDOM('').window;
@@ -31,14 +31,14 @@ export const addPost = async (formData) => {
     // Connexion à la base de données
     connectToDB();
 
-    // Récupérer la session pour obtenir l'ID de l'utilisateur connecté
-    const session = await auth();
-    console.log("SESSSSSSSSSSSSSSSSSSSSSSSSION", session)
-    const userId = session?.user?.id;  // Associer l'ID utilisateur
-
-    if (!userId) {
+    // Récupérer la session utilisateur avec ton système
+    const user = await sessionInfo();
+    if (!user) {
       throw new Error("Utilisateur non authentifié");
     }
+ 
+    const userId = new mongoose.Types.ObjectId(user._id);
+    console.log("User connecté :", userId);
 
 
     // 1. Gérer l'upload de l'image
@@ -101,7 +101,7 @@ export const addPost = async (formData) => {
     // Revalider le cache
     revalidatePath("/blog");
     revalidatePath("/dashboard");
-    return { success: true, slug: savedPost.slug }; 
+    return { success: true, slug: savedPost.slug };
   } catch (err) {
     console.log("Erreur lors de la création du post :", err);
   }
@@ -247,9 +247,7 @@ export const deletePost = async (formData) => {
 }
 
 
-export async function handleGithubLogin() {
-  await signIn("github")
-}
+
 
 
 export async function handleLogout() {
@@ -257,62 +255,4 @@ export async function handleLogout() {
 }
 
 
-export const register = async (formData) => {
-  "use server"
-  console.log("FORMDATA", formData)
-  const { username, email, password, passwordRepeat } =
-    Object.fromEntries(formData);
 
-  if (username.length < 3) {
-    return { error: "Username too short" };
-  }
-
-  // à faire en front indeed
-  if (password !== passwordRepeat) {
-    return { error: "Passwords do not match" };
-  }
-
-  try {
-    connectToDB();
-
-    const user = await User.findOne({ username });
-
-    if (user) {
-      return { error: "Username already exists" };
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = new User({
-      username,
-      email,
-      password: hashedPassword,
-
-    });
-
-    await newUser.save();
-    console.log("saved to db");
-
-    return { success: true };
-  } catch (err) {
-    console.log(err);
-    return { error: "Something went wrong!" };
-  }
-};
-
-export const login = async (formData) => {
-  const { username, password } = Object.fromEntries(formData)
-
-  try {
-    await signIn("credentials", {
-      redirect: false, // Empêche la redirection automatique
-      username,
-      password,
-    })
-    return { success: true, error: false }
-  } catch (e) {
-    console.error('Unexpected error:', e);
-    return { success: false, error: true }
-  }
-}

@@ -1,0 +1,17 @@
+.article-styles h2 {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+.article-styles p, 
+.article-styles li {
+  font-size: 18px;
+}
+.article-styles p {
+  margin-bottom: 8px;
+}
+.article-styles ul {
+  margin-bottom: 16px;
+}
+.article-styles li {
+  margin-bottom: 4px;
+}

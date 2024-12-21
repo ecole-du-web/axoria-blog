@@ -1,75 +1,39 @@
 import Image from "next/image"
-const posts = [
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-  {
-    img: "/cover-test.jpg",
-    title: "5 JavaScript tips",
-    author: "John doe"
-  },
-]
+import { getTags } from "@/lib/serverActions/dataActions"
+import Link from "next/link"
+import CardList from "@/components/CardList"
 
-export default function page() {
+export default async function Page() {
+  const tags = await getTags() // Récupération des tags
+  console.log(tags)
+
   return (
-    <>
-      <h1 className="text-3xl mb-2">All categories</h1>
-      <p className="mb-12">Find articles sorted by category tag.</p>
+    <div className="u-main-container u-padding-content-container">
+      <h1 className="u-main-title">All categories</h1>
+      <p className="u-main-subtitle">Find articles sorted by category tag.</p>
 
-      {/* Peut-être une animation sur les boutons pour montrer où on est */}
-      <button className="mr-4 text-xl">Latest</button>
-      <button className="text-xl">Most Liked</button>
-      <div className="grid grid-cols-3 gap-4 mt-4 mb-12">
-        {posts.map((post) => (
-          <div>
-            <p>JavaScript</p>
-            <p>Nombre d'articles : 99</p>
-          </div>
-        ))}
-      </div>
-      {posts.length > 9 && <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded w-fit block mx-auto">Load more</button>}
-    </>
+      {/* Section pour afficher les tags */}
+      <CardList>
+        {tags.length > 0 ? (
+          tags.map(tag => (
+            <div
+              key={tag._id}
+              className="p-4 pb-6 bg-gray-100 border rounded shadow-md"
+            >
+              <Link
+                href={`/categories/tag/${tag.name}`}
+                className="block mb-2 text-lg font-semibold underline"
+              >
+                #{tag.name}
+              </Link>
+              <p>Nombre d'articles : {tag.postCount}</p>{" "}
+              {/* Nombre d'articles */}
+            </div>
+          ))
+        ) : (
+          <p>No tag found.</p>
+        )}
+      </CardList>
+    </div>
   )
 }

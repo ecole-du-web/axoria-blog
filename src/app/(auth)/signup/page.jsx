@@ -1,43 +1,56 @@
 "use client"
-import { register } from "@/lib/actions/auth/auth.methods"
+import { register } from "@/lib/serverActions/auth/auth.methods"
 import { useRef } from "react"
 import { useRouter } from "next/navigation"
 
 export default function SignupPage() {
-  const errorRef = useRef(null) // Utilisation de useRef pour gérer l'erreur
-  const router = useRouter()
+  const serverInfoRef = useRef(null) // Utilisation de useRef pour gérer l'erreur
+  const submitButtonRef = useRef(null)
 
   const handleSubmit = async e => {
     e.preventDefault()
-    errorRef.current.textContent = "" // Reset error message
-    console.log(new FormData(e.target));
-    console.log(e.target);
+    serverInfoRef.current.textContent = "" // Reset error message
+    console.log(new FormData(e.target))
+    console.log(e.target)
 
     for (const [key, value] of new FormData(e.target).entries()) {
-      console.log(key, value);
+      console.log(key, value)
     }
-    
+
     const result = await register(new FormData(e.target))
 
-    if (result.error) {
-      errorRef.current.textContent = result.error
+    if (result.errorMsg) {
+      serverInfoRef.current.textContent = result.errorMsg
     } else if (result.success) {
-      router.push("/") // Redirection en cas de succès
+      submitButtonRef.current.textContent = "User created ✅"
+      serverInfoRef.current.style.color = "#111"
+      // Optionnel : redirection ou affichage de succès ici
+      let countdown = 3 // Le nombre de secondes avant redirection
+      serverInfoRef.current.textContent = `Redirecting in ${countdown}...`
+      const interval = setInterval(() => {
+        countdown -= 1
+        serverInfoRef.current.textContent = `Redirecting in ${countdown}...`
+
+        if (countdown === 0) {
+          clearInterval(interval) // Arrête l'intervalle
+          window.location.href = "/signin" // fonctionne mieux que router.push("/") dans ce cas. C'est next auth qui foire anyway mais avec le rsc pas de recharge de toute façon ?
+        }
+      }, 1000) // Met à jour toutes les secondes (1000 ms)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-20">
       <label
         className="block text-gray-700 text-md font-semibold mb-2"
-        htmlFor="username"
+        htmlFor="userName"
       >
         Name or pseudo
       </label>
       <input
         className="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight mb-5 focus:outline-none focus:shadow-outline"
-        id="username"
-        name="username" // Ajout de name ici
+        id="userName"
+        name="userName" // Ajout de name ici
         type="text"
         placeholder="Name or pseudo"
         required
@@ -84,14 +97,15 @@ export default function SignupPage() {
         placeholder="Confirm password"
         required
       />
-      <p ref={errorRef} className="text-red-500 mb-4"></p>{" "}
       {/* Affiche l'erreur ici */}
       <button
         type="submit"
-        className="w-full self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded border-none"
+        ref={submitButtonRef}
+        className="w-full self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 mb-5 rounded border-none"
       >
         Submit
       </button>
+      <p ref={serverInfoRef} className="text-red-500 mb-4"></p>{" "}
     </form>
   )
 }

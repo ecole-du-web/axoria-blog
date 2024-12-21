@@ -1,0 +1,25 @@
+// import { NextResponse } from "next/server";
+// import { Session } from "@/lib/models/session";
+// import { User } from "@/lib/models/user";
+
+
+// export function middleware(request) {
+//   const protectedRoutes = ["/dashboard", "/create", "/profile"]; // Routes protégées
+
+//   // Vérifie si la requête est pour une route protégée
+//   if (protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
+//     const sessionId = request.cookies.get("sessionId")?.value;
+
+//     if (!sessionId) {
+//       // Redirige si aucun cookie de session
+//       const loginUrl = new URL("/signin", request.url);
+//       return NextResponse.redirect(loginUrl);
+//     }
+//   }
+
+//   return NextResponse.next();
+// }
+
+// export const config = {
+//   matcher: ["/dashboard/:path*", "/create/:path*", "/profile/:path*"],
+// };

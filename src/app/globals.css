@@ -2,7 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-body  {
+body {
   background-color: #f1f1f1;
+}
+
+@layer components {
+  .u-main-container {
+    @apply w-full max-w-6xl m-auto px-12;
+  }
+  .u-padding-content-container {
+    @apply pt-20 pb-44;
+  }
+  .u-main-title {
+    @apply font-inter font-bold text-zinc-900 text-4xl mb-2;
+  }
+  .u-main-subtitle {
+    @apply mb-12 text-zinc-700;
+  }
 }
 

@@ -1,5 +1,5 @@
 // server-side component to fetch the post and render the form
-import { getPost } from "@/lib/actions/dataActions";
+import { getPost } from "@/lib/serverActions/dataActions";
 import ClientEditForm from "./ClientEditForm";
 
 export default async function Page({ params }) {

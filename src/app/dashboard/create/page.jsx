@@ -1,9 +1,10 @@
 "use client"
 import { useState, useRef } from "react"
-import { addPost } from "@/lib/actions/actions"
-import { useRouter } from 'next/navigation'
- 
+import { addPost } from "@/lib/serverActions/actions"
+import { useRouter } from "next/navigation"
+
 export default function Page() {
+
   const [tags, setTags] = useState([])
   const router = useRouter()
 
@@ -19,6 +20,7 @@ export default function Page() {
       tagInputRef.current.value = "" // Réinitialisation de l'input
     }
   }
+  // console.log(validation)
 
   function handleRemoveTag(tagToRemove) {
     setTags(tags.filter(tag => tag !== tagToRemove))
@@ -27,8 +29,8 @@ export default function Page() {
   async function handleSubmit(e) {
     e.preventDefault()
     const formData = new FormData(e.target)
-    formData.set("tags", JSON.stringify(tags)) // Ajoute les tags au formData
 
+    formData.set("tags", JSON.stringify(tags)) // Ajoute les tags au formData
 
     console.log(formData)
     for (let [key, value] of formData.entries()) {
@@ -36,26 +38,26 @@ export default function Page() {
     }
 
     submitButtonRef.current.textContent = "Saving Post..."
-    const result = await addPost(formData); 
+    const result = await addPost(formData)
 
     if (result.success) {
       submitButtonRef.current.textContent = "Post Saved ✅"
       // Optionnel : redirection ou affichage de succès ici
-      let countdown = 3; // Le nombre de secondes avant redirection
-      serverValidationText.current.textContent = `Redirecting in ${countdown}...`;
+      let countdown = 3 // Le nombre de secondes avant redirection
+      serverValidationText.current.textContent = `Redirecting in ${countdown}...`
       const interval = setInterval(() => {
-        countdown -= 1;
-        serverValidationText.current.textContent = `Redirecting in ${countdown}...`;
-        
+        countdown -= 1
+        serverValidationText.current.textContent = `Redirecting in ${countdown}...`
+
         if (countdown === 0) {
-          clearInterval(interval); // Arrête l'intervalle
-          router.push(`/article/${result.slug}`); // Redirige
+          clearInterval(interval) // Arrête l'intervalle
+          router.push(`/article/${result.slug}`) // Redirige
         }
-      }, 1000); // Met à jour toutes les secondes (1000 ms)
-    } else {      
+      }, 1000) // Met à jour toutes les secondes (1000 ms)
+    } else {
       submitButtonRef.current.textContent = "Submit"
-      serverValidationText.current.textContent = `Error while uploading the post. Please try again or contact the site team.`;
-  }
+      serverValidationText.current.textContent = `Error while uploading the post. Please try again or contact the site team.`
+    }
   }
 
   function handleFileChange(e) {
@@ -80,17 +82,7 @@ export default function Page() {
   }
 
   return (
-    <div className="bg-white p-7">
-      <div className="flex mb-8">
-        <h1 className="text-4xl">Create an article</h1>
-        <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded ml-auto mr-4">
-          Edit
-        </button>
-        <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded">
-          Preview
-        </button>
-      </div>
-
+    <main className="u-main-container bg-white p-7 mt-12 mb-44">
       {/* 
       si on veut juste envoyer un simple post sans tags
       <form action={addPost} > */}
@@ -102,37 +94,40 @@ export default function Page() {
           Title
         </label>
         <input
-          required
           name="title"
-          className="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight mb-5 focus:outline-none focus:shadow-outline"
+          className="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight mb-7 focus:outline-none focus:shadow-outline"
           id="title"
           type="text"
           placeholder="Title"
+          required
         />
-
+   
         <label
           className="block text-gray-700 text-md font-semibold mb-2"
           htmlFor="coverImage"
         >
-          Cover image
+          Cover image (1280x720 for best quality, or less)
         </label>
         <input
           name="coverImage"
-          className="shadow cursor-pointer border rounded w-full py-3 px-3 bg-white text-gray-700 leading-tight mb-5 focus:outline-none focus:shadow-outline"
+          className="shadow cursor-pointer border rounded w-full py-3 px-3 bg-white text-gray-700 leading-tight mb-7 focus:outline-none focus:shadow-outline"
           id="coverImage"
           type="file"
+          required
+
           placeholder="Bannière de votre article"
           onChange={handleFileChange} // Gestion de l'upload et du redimensionnement
         />
+ 
 
-        <div className="mb-7">
+        <div className="mb-10">
           <label
             className="block text-gray-700 text-md font-semibold mb-2"
             htmlFor="tag"
           >
-            Add a tag(s)
+            Add a tag(s) (optional, max 5)
           </label>
-          <div className="flex">
+          <div className="flex ">
             <input
               className="shadow appearance-none border rounded  py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="tag"
@@ -150,7 +145,7 @@ export default function Page() {
               {tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2"
+                  className="inline-block bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-sm font-semibold mr-2"
                 >
                   {tag}
                   <button
@@ -170,21 +165,25 @@ export default function Page() {
           className="block text-gray-700 text-md font-semibold mb-2"
           htmlFor="content"
         >
-          Write your article
+          Write your article using markdown - do not repeat the already given title
         </label>
+        <a target="_blank" href="https://www.markdownguide.org/cheat-sheet/" className="block mb-4 text-blue-600">How to use markdown syntax ?</a>
 
         <textarea
-          required
           name="desc"
           id="content"
-          className="min-h-44 shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight mb-5 focus:outline-none focus:shadow-outline"
+          required
+          className="min-h-44 shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight mb-2 focus:outline-none focus:shadow-outline"
         ></textarea>
-
-        <button ref={submitButtonRef} className="min-w-44 self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold mb-4 py-3 px-4 rounded border-none ">
+       
+        <button
+          ref={submitButtonRef}
+          className="min-w-44 self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold mb-4 py-3 px-4 rounded border-none "
+        >
           Submit
         </button>
-        <p ref={serverValidationText} className="text-xl">Test</p>
+        <p ref={serverValidationText} className="text-xl"></p>
       </form>
-    </div>
+    </main>
   )
 }

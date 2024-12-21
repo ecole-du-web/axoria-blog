@@ -1,4 +1,5 @@
 "use client"
+import "./article-styles.css"
 import { useEffect } from "react"
 import Prism from "prismjs"
 import 'prism-themes/themes/prism-vsc-dark-plus.css';
@@ -13,6 +14,6 @@ export default function HighlightedCode({ desc }) {
     Prism.highlightAll()
   }, [])
   return (
-    <div className="" dangerouslySetInnerHTML={{ __html: desc }}></div>
+    <div className="article-styles" dangerouslySetInnerHTML={{ __html: desc }}></div>
   )
 }
