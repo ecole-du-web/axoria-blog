@@ -1,7 +1,7 @@
 import Image from "next/image"
-import { getTags } from "@/lib/serverActions/dataActions"
 import Link from "next/link"
 import CardList from "@/components/CardList"
+import { getTags } from "@/lib/serverActions/blog/tags"
 
 export default async function Page() {
   const tags = await getTags() // Récupération des tags

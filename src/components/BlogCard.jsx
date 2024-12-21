@@ -23,14 +23,14 @@ console.log(normalizeUsername(post.author.userName));
       <div className="p-3 pb-5">
         <article className="flex max-w-xl flex-col items-start justify-between">
           <div className="flex w-full items-baseline gap-x-4 text-xs">
-            <time dateTime="2020-03-16" className="text-gray-500 text-sm">
+            <time dateTime="2020-03-16" className="text-gray-500 text-sm whitespace-nowrap truncate">
               {new Date(post.createdAt).toLocaleDateString("fr-FR", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
               })}
             </time>
-            <Link href={`/categories/author/${post.author.normalizedUserName}`} className="ml-auto text-base text-gray-700">{post.author.userName}</Link>
+            <Link href={`/categories/author/${post.author.normalizedUserName}`} className="ml-auto text-base text-gray-700 whitespace-nowrap truncate">{post.author.userName}</Link>
           </div>
           <div className="group relative">
             <Link

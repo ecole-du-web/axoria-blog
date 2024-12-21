@@ -1,5 +1,6 @@
-import { getUserPostsFromSessionID, deletePost } from "@/lib/serverActions/dataActions"
+import { getUserPostsFromSessionID } from "@/lib/serverActions/blog/dataFetchers"
 import Link from "next/link"
+import { deletePost } from "@/lib/serverActions/blog/CDUactions"
 import { validateSession } from "@/lib/server/session/validateSession"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"

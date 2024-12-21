@@ -1,7 +1,7 @@
 "use client"
 import { useState, useRef, useEffect } from "react"
 import { useParams } from "next/navigation"; // Importer useParams depuis next/navigation
-import { editPost } from "@/lib/serverActions/actions";
+import { editPost } from "@/lib/serverActions/blog/CDUactions";
 export default function Page({post}) {
   console.log("CLIENT EDIT", post);
   

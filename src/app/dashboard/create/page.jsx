@@ -1,6 +1,6 @@
 "use client"
 import { useState, useRef } from "react"
-import { addPost } from "@/lib/serverActions/actions"
+import { addPost } from "@/lib/serverActions/blog/CDUactions"
 import { useRouter } from "next/navigation"
 
 export default function Page() {

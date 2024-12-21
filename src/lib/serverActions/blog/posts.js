@@ -1,24 +1,17 @@
-"use server";
-import { connectToDB } from "../utils/connectToDB";
-import { Post } from "../models/post";
-import { Tag } from "../models/tag";  // Importer correctement le modèle Tag
+"use server"
+import { Post } from "@/lib/models/post";
+import { connectToDB } from "../../utils/connectToDB";
 import { revalidatePath } from "next/cache";
-// import { signIn, signOut } from "./auth"
-// import bcrypt from "bcryptjs"
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-
 import { storage } from "@/lib/utils/firebase"; // Importer Firebase Storage
 import sharp from "sharp"
-// Récupère le cookie et les données de session
-import { auth } from "./auth/auth";
 import { marked } from 'marked';  // Import de la bibliothèque marked
-// import sanitizeHtml from 'sanitize-html'; // Pour nettoyer le HTML
-import { getPost } from "./dataActions";
-
+import { findOrCreateTag } from "./utils";
 import { JSDOM } from 'jsdom';
 import createDOMPurify from 'dompurify';
 import mongoose from "mongoose";
-import { sessionInfo } from "../server/session/sessionMethods";
+import { sessionInfo } from "../../server/session/sessionMethods";
+
 
 // Créer un DOM simulé pour DOMPurify côté serveur
 const window = new JSDOM('').window;
@@ -36,7 +29,7 @@ export const addPost = async (formData) => {
     if (!user) {
       throw new Error("Utilisateur non authentifié");
     }
- 
+
     const userId = new mongoose.Types.ObjectId(user._id);
     console.log("User connecté :", userId);
 
@@ -104,6 +97,71 @@ export const addPost = async (formData) => {
     return { success: true, slug: savedPost.slug };
   } catch (err) {
     console.log("Erreur lors de la création du post :", err);
+  }
+};
+
+export const getPosts = async () => {
+  try {
+    await connectToDB();
+    const posts = await Post.find({})
+      .populate("author", "userName normalizedUserName") // Peupler `author` avec seulement `userName`
+      .select("title coverImageUrl thumbnailUrl slug createdAt updatedAt"); // Sélectionner les champs nécessaires
+
+    return posts;
+  } catch (err) {
+    console.error("Error fetching posts:", err);
+    throw new Error("Failed to fetch posts!");
+  }
+};
+
+
+export const getPost = async (slug) => {
+  try {
+    await connectToDB();
+    console.log(`Fetching post with slug: ${slug}`);
+
+    // Récupérer l'objet Mongoose
+    // Il faut import Tag quand on populate
+    // select s'applique au modèle principal ici POST, et populate aux documents d'un autre modèle lié.
+    // Ex : const post = await Post.findOne({ slug })
+    // .select("title content")  // Champs du modèle Post
+    // .populate("tags", "name description"); // Champs du modèle Tag
+    const post = await Post.findOne({ slug })
+      .populate({
+        path: "author", // Enrichit l'objet `author`
+        select: "userName normalizedUserName", // Inclut les champs nécessaires depuis User
+      })
+      .populate({
+        path: "tags",
+        select: "name", // Inclut le champ `name` depuis Tag
+      });
+
+    console.log("Post enrichi :", post);
+    // On utilise populate ici car author et tags sont des références (ObjectId) à d'autres collections. populate permet d'enrichir ces références avec leurs données. À l'inverse, select est utilisé pour limiter les champs directement sur le document principal (ici Post). Donc, pour les sous-documents référencés, populate avec un sélecteur est nécessaire.
+
+
+    if (!post) return null;
+
+    // Convertir l'objet en un objet simple
+
+    // c'est différent d'avec getPosts car : lean() : Quand vous utilisez .lean() sur une requête Mongoose (ou implicitement dans des méthodes de récupération multiples), les documents retournés ne sont pas des objets Mongoose enrichis mais des objets JavaScript purs. Cela signifie qu'ils n'ont pas les méthodes et les propriétés supplémentaires que Mongoose ajoute, rendant inutile l'appel de toObject().
+    const plainPost = post.toObject();
+    // Conversion explicite des champs nécessaires
+    return {
+      ...plainPost,
+      author: post.author.userName, // Exemple: inclure seulement le nom de l'auteur car sinon bug not plain object
+      normalizedUserName: post.author.normalizedUserName,
+
+      _id: plainPost._id.toString(), // Convertir ObjectId en chaîne
+      tags: plainPost.tags.map(tag => ( // On ne garde que le nom qui est unique, pas besoin de prendre l'_id implicitement retourné par populate.
+        tag.name           // Nom du tag
+      )), // Convertir chaque tag ObjectId en chaîne
+      createdAt: plainPost.createdAt.toISOString(), // Convertir date en chaîne ISO
+      updatedAt: plainPost.updatedAt.toISOString(), // Convertir date en chaîne ISO
+    };
+  } catch (err) {
+    console.error("Error fetching post:", err);
+    throw new Error("Failed to fetch post!");
   }
 };
 
@@ -210,49 +268,49 @@ export const editPost = async (formData) => {
 };
 
 
+export const deletePost = async (formData) => {
+  const { id } = Object.fromEntries(formData);
 
+  try {
+    await connectToDB();
 
-
-const findOrCreateTag = async (tagName) => {
-  const normalizedTagName = tagName.trim().toLowerCase();  // Normaliser le tag
-  let tag = await Tag.findOne({ name: normalizedTagName });  // Rechercher le tag
-
-  if (!tag) {
-    tag = await Tag.create({ name: normalizedTagName });  // Créer le tag si non trouvé
+    await Post.findByIdAndDelete(id);
+    console.log("deleted from db");
+    // à voir mais mets à jour automatiquement meme si on est sur la pge, plus pratique qu'un redirect mais trop documenté.
+    revalidatePath("/dashboard");
+    // redirect("/dashboard");
+  } catch (err) {
+    console.log(err);
+    return { error: "Something went wrong!" };
   }
-
-  return tag._id;  // Retourner l'ObjectId du tag
 };
 
 
 
+// SANS DB
 
+// TEMPORARY DATA
+// const users = [
+//   { id: 1, name: "John" },
+//   { id: 2, name: "Jane" },
+// ];
 
-export const deletePost = async (formData) => {
-  "use server" // tu peux le mettre une fois en haut du fichier
+// const posts = [
+//   { id: 1, title: "Post 1", body: "......", userId: 1 },
+//   { id: 2, title: "Post 2", body: "......", userId: 1 },
+//   { id: 3, title: "Post 3", body: "......", userId: 2 },
+//   { id: 4, title: "Post 4", body: "......", userId: 2 },
+// ];
 
-  const { id } = Object.fromEntries(formData)
+// export const getPosts = async () => {
+//   return posts
+// };
 
+// export const getPost = async (id) => {
+//   const post = posts.find((post) => post.id === parseInt(id))
+//   return post
+// };
 
-  try {
-    connectToDB()
-
-    await Post.findByIdAndDelete(id)
-    console.log("Deleted from DB")
-    revalidatePath("/blog")
-  } catch (err) {
-    console.log(err)
-  }
-
-}
-
-
-
-
-
-export async function handleLogout() {
-  await signOut()
-}
-
-
-
+// export const getUser = async (id) => {
+//   return users.find((user) => user.id === parseInt(id))
+// };

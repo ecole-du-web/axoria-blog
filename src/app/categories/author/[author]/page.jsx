@@ -1,4 +1,4 @@
-import { getArticlesByAuthor } from "@/lib/serverActions/dataActions"
+import { getArticlesByAuthor } from "@/lib/serverActions/blog/dataFetchers"
 import BlogCard from "@/components/BlogCard"
 import CardList from "@/components/CardList"
 import { notFound } from "next/navigation"; // Méthode native pour rendre une 404

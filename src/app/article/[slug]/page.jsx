@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { getPost } from "@/lib/serverActions/dataActions"
+import { getPost } from "@/lib/serverActions/blog/dataFetchers"
 import HighlightedCode from "./HighlightedCode"
 import Link from "next/link"
 

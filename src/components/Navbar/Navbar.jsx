@@ -1,6 +1,3 @@
-import Link from "next/link"
-import Dropdown from "./Dropdown/Dropdown"
-import { auth } from "@/lib/serverActions/auth/auth";
 import Links from "./Links.jsx"
 import { sessionInfo } from "@/lib/server/session/sessionMethods";
 export default async function Navbar() {
