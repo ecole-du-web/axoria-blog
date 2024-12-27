@@ -1,6 +1,8 @@
 import { cookies } from "next/headers"; // Pour accéder aux cookies dans un composant serveur
 import { Session } from "@/lib/models/session";
 import { User } from "@/lib/models/user";
+import { connectToDB } from "@/lib/utils/connectToDB";
+import { connect } from "mongoose";
 
 export async function sessionInfo() {
   // Lire le cookie 'sessionId'
@@ -10,7 +12,7 @@ export async function sessionInfo() {
   if (!sessionId) {
     return null; // Pas de session, donc pas d'utilisateur connecté
   }
-
+  await connectToDB()
   // Vérifier la session dans la base de données
   const session = await Session.findById(sessionId);
 
@@ -33,6 +35,7 @@ export async function sessionInfo() {
 
 
 export async function validateSession(sessionId) {
+  await connectToDB()
   if (!sessionId) {
     return null; // Pas de sessionId, donc pas de session valide
   }

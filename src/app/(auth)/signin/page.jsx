@@ -7,26 +7,29 @@ import { useRef } from "react"
 export default function Page() {
   const router = useRouter()
   const serverErrorRef = useRef()
+  const submitButtonRef = useRef(null)
 
   const handleSubmit = async e => {
-    e.preventDefault();
-  
-    const formData = new FormData(e.target); // Récupère les données du formulaire
-    
+    e.preventDefault()
+    serverErrorRef.current.textContent = "" // reset d'un potentiel message
+
+    const formData = new FormData(e.target) // Récupère les données du formulaire
+
+    submitButtonRef.current.disabled = true
     try {
-      const result = await login(formData);
-  
+      const result = await login(formData)
+
       if (result?.errorMsg) {
-        serverErrorRef.current.textContent = result.errorMsg;
+        serverErrorRef.current.textContent = result.errorMsg
       } else {
-        router.push("/"); // Redirige vers la page d'accueil si succès
+        router.push("/") // Redirige vers la page d'accueil si succès
       }
     } catch (err) {
-      console.error("Error during login:", err);
-      serverErrorRef.current.textContent = "An unexpected error occurred.";
+      console.error("Error during login:", err)
+      submitButtonRef.current.disabled = false
+      serverErrorRef.current.textContent = err.message
     }
-  };
-  
+  }
 
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-20">
@@ -60,7 +63,10 @@ export default function Page() {
         placeholder="Your password"
       />
 
-      <button className="w-full self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 mb-3 rounded border-none ">
+      <button
+        ref={submitButtonRef}
+        className="w-full self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 mb-3 rounded border-none "
+      >
         Submit
       </button>
       <p ref={serverErrorRef} className="text-red-600 mt-2"></p>

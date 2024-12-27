@@ -8,12 +8,12 @@ import 'prism-themes/themes/prism-vsc-dark-plus.css';
 // import "prismjs/themes/prism-twilight.css" // Importer le thème
 import "prismjs/components/prism-javascript" // Exemple pour le JS
 import "prismjs/components/prism-css" // Exemple pour le CSS
-export default function HighlightedCode({ desc }) {
+export default function HighlightedCode({ markdownHTMLResult }) {
   useEffect(() => {
     // Active la coloration syntaxique avec Prism.js après le rendu du composant
     Prism.highlightAll()
   }, [])
   return (
-    <div className="article-styles" dangerouslySetInnerHTML={{ __html: desc }}></div>
+    <div className="article-styles" dangerouslySetInnerHTML={{ __html: markdownHTMLResult }}></div>
   )
 }

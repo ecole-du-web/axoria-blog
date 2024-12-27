@@ -2,7 +2,7 @@
   font-size: 32px;
   margin-bottom: 12px;
 }
-.article-styles p, 
+.article-styles p,
 .article-styles li {
   font-size: 18px;
 }
@@ -14,4 +14,13 @@
 }
 .article-styles li {
   margin-bottom: 4px;
+}
+.article-styles pre {
+  display: block;
+  margin: 20px 0 !important;
+  padding: 24px 24px 32px !important;
+  border-radius: 5px;
+}
+.article-styles pre code {
+  font-size: 18px;
 }

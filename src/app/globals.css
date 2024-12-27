@@ -5,19 +5,27 @@
 body {
   background-color: #f1f1f1;
 }
+
 /* Utils classes */
 .u-main-container {
-  @apply w-full max-w-6xl m-auto px-12;
+  @apply w-full max-w-6xl mx-auto px-12;
 }
 .u-padding-content-container {
   @apply pt-20 pb-44;
 }
-.u-main-title {
+.u-articles-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 mt-4 mb-12 list-none;
+}
+
+/* Typographie */
+.t-main-title {
   @apply font-inter font-bold text-zinc-900 text-4xl mb-2;
 }
-.u-main-subtitle {
+.t-main-subtitle {
   @apply mb-12 text-zinc-700;
 }
-.u-articles-grid {
-  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 mt-4 mb-12;
+
+/* Forms */
+.f-label {
+  @apply block mb-2 text-gray-700 font-semibold;
 }

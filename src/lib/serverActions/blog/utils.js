@@ -1,4 +1,5 @@
-import { Tag } from "@/lib/models/tag";
+// Pas de use server ici, juste une méthode à exécuter côté serveur;
+import { Tag } from "../../models/tag";
 
 export async function findOrCreateTag(tagName) {
   const normalizedTagName = tagName.trim().toLowerCase();  // Normaliser le tag

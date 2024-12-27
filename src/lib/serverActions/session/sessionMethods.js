@@ -4,18 +4,19 @@ import { User } from "@/lib/models/user";
 import { Session } from "@/lib/models/session";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers"; // Pour définir des cookies HTTP-only
-import { normalizeUsername } from "@/lib/utils/utils-methods";
+import { normalizeText } from "@/lib/utils/utils-methods";
+import { connectToDB } from "@/lib/utils/connectToDB";
 
 export const register = async (formData) => {
   console.log("ENREGISTREMENT UTILISATEUR", formData);
   const { userName, email, password, passwordRepeat } = Object.fromEntries(formData);
 
   if (userName.length < 3) {
-    return { errorMsg: "Username too short" };
+    throw new Error("Username too short")
   }
 
   if (password !== passwordRepeat) {
-    return { errorMsg: "Passwords do not match" };
+    throw new Error("Passwords do not match")
   }
 
   try {
@@ -24,11 +25,11 @@ export const register = async (formData) => {
     const user = await User.findOne({ userName });
 
     if (user) {
-      return { errorMsg: "UserName already exists" };
+      throw new Error("UserName already exists")
     }
 
     // Version normalisée pour les URLS/utilisation dans les autres server actions (getPostsByAuthor)
-    const normalizedUserName = normalizeUsername(userName);
+    const normalizedUserName = normalizeText(userName);
     console.log(normalizedUserName)
 
     const salt = await bcrypt.genSalt(10);
@@ -45,29 +46,30 @@ export const register = async (formData) => {
     console.log("saved to db");
 
 
-   // Retournez un succès sans essayer de connecter l'utilisateur
-   return { success: true };
- } catch (err) {
-   console.error(err);
-   return { error: "Something went wrong!" };
- }
+    // Retournez un succès sans essayer de connecter l'utilisateur
+    return { success: true };
+  } catch (err) {
+    console.error(err);
+    throw new Error("Something went wrong!");
+  }
 };
 
 
 
 // Fonction de login
 export async function login(formData) {
-  const username = formData.get("userName");
+  await connectToDB()
+  const userName = formData.get("userName");
   const password = formData.get("password");
-
-  const user = await User.findOne({ userName: username });
+  console.log("zzzzzzzzzqsd",userName)
+  const user = await User.findOne({ userName: userName });
   if (!user) {
-    return { errorMsg: "User not found" };
+    throw new Error("Invalid credentials"); // Attention pas d'affichage d'info sur les users/psw côté client
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    return { errorMsg: "Invalid credentials" };
+    throw new Error("Invalid credentials")
   }
 
   // Vérifie si une session existe déjà
@@ -110,10 +112,6 @@ export async function logout() {
   const cookieStore = cookies();
   const sessionId = cookieStore.get("sessionId")?.value;
 
-  // Vérification si il y a une session à supprimer(cas rares)
-  if (!sessionId) {
-    return { errorMsg: "No session to log out" }; // Pas de session active
-  }
 
   try {
     // Supprime la session de la base de données
@@ -130,7 +128,6 @@ export async function logout() {
 
     return { success: true }; // Confirme le logout
   } catch (error) {
-    console.error("Erreur lors de la déconnexion :", error);
-    return { errorMsg: "Logout failed" };
+    console.error(error)
   }
 }

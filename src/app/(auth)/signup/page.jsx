@@ -1,7 +1,7 @@
 "use client"
-import { register } from "@/lib/serverActions/auth/auth.methods"
 import { useRef } from "react"
 import { useRouter } from "next/navigation"
+import { register } from "@/lib/serverActions/session/sessionMethods"
 
 export default function SignupPage() {
   const serverInfoRef = useRef(null) // Utilisation de useRef pour gérer l'erreur
@@ -17,25 +17,31 @@ export default function SignupPage() {
       console.log(key, value)
     }
 
-    const result = await register(new FormData(e.target))
+    submitButtonRef.current.textContent = "Saving User..."
+    submitButtonRef.current.disabled = true
+    try {
+      const result = await register(new FormData(e.target))
 
-    if (result.errorMsg) {
-      serverInfoRef.current.textContent = result.errorMsg
-    } else if (result.success) {
-      submitButtonRef.current.textContent = "User created ✅"
-      serverInfoRef.current.style.color = "#111"
-      // Optionnel : redirection ou affichage de succès ici
-      let countdown = 3 // Le nombre de secondes avant redirection
-      serverInfoRef.current.textContent = `Redirecting in ${countdown}...`
-      const interval = setInterval(() => {
-        countdown -= 1
+      if (result.success) {
+        submitButtonRef.current.textContent = "User created ✅"
+        serverInfoRef.current.style.color = "#111"
+        // Optionnel : redirection ou affichage de succès ici
+        let countdown = 3 // Le nombre de secondes avant redirection
         serverInfoRef.current.textContent = `Redirecting in ${countdown}...`
+        const interval = setInterval(() => {
+          countdown -= 1
+          serverInfoRef.current.textContent = `Redirecting in ${countdown}...`
 
-        if (countdown === 0) {
-          clearInterval(interval) // Arrête l'intervalle
-          window.location.href = "/signin" // fonctionne mieux que router.push("/") dans ce cas. C'est next auth qui foire anyway mais avec le rsc pas de recharge de toute façon ?
-        }
-      }, 1000) // Met à jour toutes les secondes (1000 ms)
+          if (countdown === 0) {
+            clearInterval(interval) // Arrête l'intervalle
+            window.location.href = "/signin" // fonctionne mieux que router.push("/") dans ce cas. C'est next auth qui foire anyway mais avec le rsc pas de recharge de toute façon ?
+          }
+        }, 1000) // Met à jour toutes les secondes (1000 ms)
+      }
+    } catch (error) {
+      submitButtonRef.current.textContent = "Submit"
+      submitButtonRef.current.disabled = false
+      serverInfoRef.current.textContent = error.message // erreur fournie par throw new Error
     }
   }
 
@@ -101,11 +107,12 @@ export default function SignupPage() {
       <button
         type="submit"
         ref={submitButtonRef}
-        className="w-full self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 mb-5 rounded border-none"
+        className="w-full self-end bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 mb-10 rounded border-none"
       >
         Submit
       </button>
-      <p ref={serverInfoRef} className="text-red-500 mb-4"></p>{" "}
+      <a href="/signin" className="mb-5 underline text-blue-600 block text-center">Already have an account ? Log in</a>
+      <p ref={serverInfoRef}></p>
     </form>
   )
 }

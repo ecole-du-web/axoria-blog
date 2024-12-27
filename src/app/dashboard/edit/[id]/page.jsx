@@ -1,6 +1,6 @@
 // server-side component to fetch the post and render the form
-import { getPost } from "@/lib/serverActions/blog/dataFetchers";
 import ClientEditForm from "./ClientEditForm";
+import { getPost } from "@/lib/server/blog/postMethods";
 
 export default async function Page({ params }) {
   const { id } = params;

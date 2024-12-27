@@ -1,19 +1,31 @@
 import Image from "next/image"
-import { getPost } from "@/lib/serverActions/blog/dataFetchers"
 import HighlightedCode from "./HighlightedCode"
 import Link from "next/link"
-
+import { getPost } from "@/lib/server/blog/postMethods"
 export default async function page({ params }) {
   const { slug } = params
   const post = await getPost(slug)
-  console.log("ARTICLE", post)
 
   return (
     <main className="u-main-container u-padding-content-container">
-      <h1 className="text-4xl mb-2">{post.title}</h1>
+      <h1 className="text-4xl mb-3">{post.title}</h1>
       <p className="mb-6">
-        <Link href={`/categories/author/${post.normalizedUserName}`} className="mr-4">By {post.author}</Link>
-        {post.tags.map(tag => <span className="ml-2">#{tag}</span>)}
+        By&nbsp;
+        <Link
+          href={`/categories/author/${post.normalizedUserName}`}
+          className="mr-4 underline"
+        >
+          {post.author}
+        </Link>
+        {post.tags.map(tag => (
+          <Link
+            key={tag}
+            href={`/categories/tag/${tag.slug}`}
+            className="mr-4 underline"
+          >
+            <span>#{tag.name}</span>
+          </Link>
+        ))}
       </p>
       <Image
         src={post.coverImageUrl}
@@ -22,9 +34,9 @@ export default async function page({ params }) {
         alt={post.title}
         className="mb-10"
       />
-   
+
       {/* Affichage sécurisé du HTML */}
-      <HighlightedCode desc={post.desc} />
+      <HighlightedCode markdownHTMLResult={post.markdownHTMLResult} />
     </main>
   )
 }

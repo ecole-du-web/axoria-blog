@@ -1,25 +1,22 @@
-import { getUserPostsFromSessionID } from "@/lib/serverActions/blog/dataFetchers"
 import Link from "next/link"
-import { deletePost } from "@/lib/serverActions/blog/CDUactions"
-import { validateSession } from "@/lib/server/session/validateSession"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-
+import { getUserPostsFromSessionID } from "@/lib/server/blog/postMethods"
+import { deletePost } from "@/lib/serverActions/blog/postServerActions"
+import { validateSession } from "@/lib/server/session/sessionMethods"
 export default async function page() {
-    // Récupérer le cookie de session
-    const cookieStore = cookies();
-    const sessionId = cookieStore.get("sessionId")?.value;
-  
-    // Valider la session
-    const userId = await validateSession(sessionId);
-  
-    if (!userId) {
-      redirect("/signin"); // Redirige si la session est invalide
-    }
+  // Récupérer le cookie de session
+  const cookieStore = cookies()
+  const sessionId = cookieStore.get("sessionId")?.value
 
+  // Valider la session
+  const userId = await validateSession(sessionId)
 
+  if (!userId) {
+    redirect("/signin") // Redirige si la session est invalide
+  }
 
-  const posts = await getUserPostsFromSessionID() // Récupère les articles de l'utilisateur connecté
+  const posts = await getUserPostsFromSessionID(userId) // Récupère les articles de l'utilisateur connecté
   // console.log(posts)
 
   return (
@@ -28,11 +25,17 @@ export default async function page() {
       <ul>
         {posts.length > 0 ? (
           posts.map(post => (
-            <li className="flex items-center mb-2 bg-slate-50 py-2 pl-4" key={post._id}>
-              <Link className="mr-auto underline underline-offset-2 text-violet-600" href={`article/${post.title}`}>
+            <li
+              className="flex items-center mb-2 bg-slate-50 py-2 pl-4"
+              key={post._id}
+            >
+              <Link
+                className="mr-auto underline underline-offset-2 text-violet-600"
+                href={`article/${post.title}`}
+              >
                 {post.title}
               </Link>
-              <form action={deletePost} >
+              <form action={deletePost}>
                 <input type="hidden" name="id" value={post._id.toString()} />
                 <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded mr-2">
                   Delete
@@ -40,14 +43,14 @@ export default async function page() {
               </form>
               <Link
                 className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded mr-2"
-                href={`/edit/${post.slug}`}
+                href={`/dashboard/edit/${post.slug}`}
               >
                 Edit
               </Link>
             </li>
           ))
         ) : (
-          <li>Vous n'avez pas encore créé d'articles.</li>
+          <li>You haven't created any articles yet.</li>
         )}
       </ul>
     </main>

@@ -1,28 +1,26 @@
-import { getArticlesByTag } from "@/lib/serverActions/blog/dataFetchers"
 import BlogCard from "@/components/BlogCard"
-import CardList from "@/components/CardList"
-import { notFound } from "next/navigation" // Méthode native pour rendre une 404
 
+import { getPostsByTag } from "@/lib/server/blog/postMethods"
 export default async function page({ params }) {
   const { tag } = params
-  const posts = await getArticlesByTag(tag)
-  console.log("POSSSSSSSSSSSSSSTS", posts)
-  if (posts.error) {
-    notFound() // page 404 si l'auteur n'existe pas
-  }
+  const posts = await getPostsByTag(tag)
+  console.log(posts, "yyy");
+  
   return (
-    <main className="u-main-container u-padding-content-container">
-      <h1 className="u-main-title">Posts from the #{tag} tag.</h1>
-      <p className="u-main-subtitle">All of the posts that uses that tag</p>
+    <div className="u-main-container u-padding-content-container">
+      <h1 className="t-main-title">Posts from the #{tag} tag. 🏷️</h1>
+      <p className="t-main-subtitle">All of the posts that uses that tag</p>
 
-      {/* Peut-être une animation sur les boutons pour montrer où on est */}
-      {/* new date ? juste l'id de map si c'est pas une liset dynamique */}
       <p className="mr-4 text-md text-zinc-900">Latest articles</p>
-      <CardList>
-        {posts.map(post => (
-          <BlogCard key={new Date()} post={post} />
-        ))}
-      </CardList>
-    </main>
+      {/* Parfois des tags peuvent avoir été créé mais vides car les articles associés ont été supprimés, donc on gère ce cas rare */}
+    
+      <ul className="u-articles-grid">
+        {posts.length > 0 ? (
+          posts.map((post,id) => <BlogCard key={id} post={post} />)
+        ) : (
+          <li>No articles found for that tag. 🤖</li>
+        )}
+      </ul>
+    </div>
   )
 }
