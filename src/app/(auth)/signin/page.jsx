@@ -3,31 +3,33 @@
 import { login } from "@/lib/serverActions/session/sessionMethods"
 import { useRouter } from "next/navigation"
 import { useRef } from "react"
+import { useAuth } from "@/app/AuthContext"
 
 export default function Page() {
   const router = useRouter()
-  const serverErrorRef = useRef()
+  const serverInfoRef = useRef()
   const submitButtonRef = useRef(null)
 
-  const handleSubmit = async e => {
-    e.preventDefault()
-    serverErrorRef.current.textContent = "" // reset d'un potentiel message
+  const {setIsAuthenticated} = useAuth()
 
-    const formData = new FormData(e.target) // Récupère les données du formulaire
+  async function handleSubmit(e) {
+
+
+    e.preventDefault()
+    serverInfoRef.current.textContent = "" // reset d'un potentiel message
 
     submitButtonRef.current.disabled = true
     try {
-      const result = await login(formData)
+      const result = await login(new FormData(e.target))
 
-      if (result?.errorMsg) {
-        serverErrorRef.current.textContent = result.errorMsg
-      } else {
+      if (result.success) {
+        setIsAuthenticated({ loading: false, isConnected: true })
         router.push("/") // Redirige vers la page d'accueil si succès
       }
     } catch (err) {
       console.error("Error during login:", err)
       submitButtonRef.current.disabled = false
-      serverErrorRef.current.textContent = err.message
+      serverInfoRef.current.textContent = err.message
     }
   }
 
@@ -69,7 +71,7 @@ export default function Page() {
       >
         Submit
       </button>
-      <p ref={serverErrorRef} className="text-red-600 mt-2"></p>
+      <p ref={serverInfoRef} className="text-red-600 mt-2"></p>
     </form>
   )
 }

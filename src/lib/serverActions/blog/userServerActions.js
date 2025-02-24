@@ -1,5 +1,5 @@
 "use server"
-import { connectToDB } from "@/lib/utils/connectToDB";
+import { connectToDB } from "@/lib/utils/db/connectToDB";
 import { User } from "@/lib/models/user";
 // import mongoose from "mongoose";
 import { unstable_noStore as noStore } from "next/cache";

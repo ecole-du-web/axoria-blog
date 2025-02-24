@@ -4,7 +4,7 @@ import { getPostsByTag } from "@/lib/server/blog/postMethods"
 export default async function page({ params }) {
   const { tag } = params
   const posts = await getPostsByTag(tag)
-  console.log(posts, "yyy");
+  console.log(posts);
   
   return (
     <div className="u-main-container u-padding-content-container">

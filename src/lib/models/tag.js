@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { normalizeText } from "../utils/utils-methods";
 
 const tagSchema = new mongoose.Schema({
   name: {
@@ -17,12 +16,12 @@ const tagSchema = new mongoose.Schema({
 });
 
 // Middleware pour normaliser le `name` et générer le `slug`
-tagSchema.pre("save", function (next) {
-  if (!this.slug) { // Vérifie que le document est en cours de création, pour juste executer ça la première fois
-    this.slug = normalizeText(this.name); // Génère le slug uniquement à la création
-  }
-  next();
-});
+// tagSchema.pre("save", function (next) {
+//   if (!this.slug) { // Vérifie que le document est en cours de création, pour juste executer ça la première fois
+//     this.slug = normalizeText(this.name); // Génère le slug uniquement à la création
+//   }
+//   next();
+// });
 
 // Cette structure permet d’éviter l’erreur : "Cannot overwrite Tag model once compiled", courante dans les environnements où les modules sont rechargés dynamiquement.
 export const Tag = mongoose.models?.Tag || mongoose.model("Tag", tagSchema);

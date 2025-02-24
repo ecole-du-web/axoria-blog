@@ -1,3 +1,4 @@
+
 .article-styles h2 {
   font-size: 32px;
   margin-bottom: 12px;
@@ -23,4 +24,8 @@
 }
 .article-styles pre code {
   font-size: 18px;
+}
+
+.article-styles pre {
+  background: #060606;
 }

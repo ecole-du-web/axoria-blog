@@ -1,6 +1,7 @@
 import "./globals.css"
 import Navbar from "@/components/Navbar/Navbar"
 import Footer from "@/components/Footer"
+import { AuthProvider } from "./AuthContext"
 
 export default function RootLayout({ children }) {
   return (
@@ -9,8 +10,10 @@ export default function RootLayout({ children }) {
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
       <body className="flex min-h-full flex-col">
-        <Navbar />
+        <AuthProvider>
+          <Navbar />
           <main className="grow">{children}</main>
+        </AuthProvider>
         <Footer />
       </body>
     </html>

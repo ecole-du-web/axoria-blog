@@ -1,3 +1,30 @@
+créer le compte
+créer le cluster
+créer la db
+créer un password
+créer un URI avec connect
+créer .env.local
+créer MONGO=uri avec pswd + nom de bdd
+
+
+Une ODM (Object Document Mapping) est une bibliothèque qui fait le lien entre une base de données orientée documents (comme MongoDB) et les objets de votre code. Elle permet :
+
+Définir des schémas : Spécifier la structure des documents (champs, types, contraintes).
+Validation automatique : Vérifier que les données respectent le schéma avant insertion ou mise à jour.
+Méthodes pratiques : Fournir des fonctions comme find, save, update pour interagir avec la base.
+Relations : Gérer les références ou les relations entre documents.
+Exemple : Mongoose est une ODM pour MongoDB.
+
+
+
+
+
+
+
+
+
+
+
 // import { NextResponse } from "next/server";
 // import { Session } from "@/lib/models/session";
 // import { User } from "@/lib/models/user";

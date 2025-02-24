@@ -6,7 +6,6 @@ export default async function Page({ params }) {
   const { id } = params;
   const post = await getPost(id);
 
-  console.log("TZEZZZZZZZZZZZZZZZ",post._id);
   
 
   return <ClientEditForm post={post} />;

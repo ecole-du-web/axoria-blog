@@ -3,7 +3,8 @@ import { getTags } from "@/lib/server/blog/tagMethods"
 
 export default async function Page() {
   const tags = await getTags() // Récupération des tags
-
+  console.log(tags, "tagsConsole");
+  
   return (
     <div className="u-main-container u-padding-content-container">
       <h1 className="t-main-title">All categories</h1>

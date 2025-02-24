@@ -5,7 +5,6 @@ import { editPost } from "@/lib/serverActions/blog/postServerActions"
 
 export default function Page({ post }) {
   const [tags, setTags] = useState(post.tags.map(tag => tag.name))
-  console.log("ici",post);
   
   const router = useRouter()
 
@@ -23,7 +22,6 @@ export default function Page({ post }) {
       tagInputRef.current.value = "" // Réinitialisation de l'input
     }
   }
-  console.log("tags", tags)
 
   function handleRemoveTag(tagToRemove) {
     setTags(tags.filter(tag => tag !== tagToRemove))
@@ -35,9 +33,7 @@ export default function Page({ post }) {
 
     // Simple validation pour savoir si on a modifié du contenu ou pas, ux non sécurisé donc à faire côté bakc end aussi
     const readableFormData = Object.fromEntries(formData)
-    console.log("readableFormData",readableFormData);
     const areSameTags = areTagsSimilar(tags, post.tags)
-    console.log(areSameTags);
     
     if(readableFormData.title === post.title && readableFormData.markdownArticle === post.markdownArticle && areSameTags) {
       globalValidationRef.current.textContent = "You must make a change before submitting."
@@ -53,7 +49,6 @@ export default function Page({ post }) {
 
     submitButtonRef.current.textContent = "Updating Post..."
     submitButtonRef.current.disabled = true
-    console.log("CURRENT BTN", submitButtonRef.current)
 
     try {
       const result = await editPost(formData) // Appelle la fonction `editPost` avec les données du formulaire

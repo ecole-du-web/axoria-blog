@@ -1,13 +1,12 @@
 import mongoose from "mongoose";
 import slugify from "slugify";
-import { User } from "./user";
 
 const postSchema = new mongoose.Schema(
   {
     title: {
       type: String,
       required: true,
-      unique: true
+      // unique: true
     },
     markdownHTMLResult: {
       type: String,
@@ -39,10 +38,11 @@ const postSchema = new mongoose.Schema(
 );
 
 // Slug à changer quand on modifie un article ?
+
+// middleware qui s'execute lors d'un document créé à partir d'un modèle, avant la sauvegarde
 postSchema.pre("save", async function (next) {
   if (!this.slug) {
     let slugCandidate = slugify(this.title, { lower: true, strict: true });
-    console.log("Initial slug candidate:", slugCandidate);
 
     let slugExists = await mongoose.models.Post.findOne({ slug: slugCandidate });
 
@@ -54,9 +54,10 @@ postSchema.pre("save", async function (next) {
     }
 
     this.slug = slugCandidate;
-    console.log("Final slug generated:", this.slug);
   }
   next();
 });
 
+// Crée une instance du modèle Post à partir du schéma postSchema.
+// Si le modèle existe déjà (dans le cache de Mongoose, via mongoose.models), il le réutilise.
 export const Post = mongoose.models?.Post || mongoose.model("Post", postSchema);

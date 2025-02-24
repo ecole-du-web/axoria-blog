@@ -1,27 +1,35 @@
 "use client"
 import { useRef, useState, useEffect } from "react"
 import Image from "next/image"
-import { logout } from "@/lib/serverActions/session/sessionMethods"
-import { isPrivatePage } from "@/lib/serverActions/session/utils"
+import { logOut } from "@/lib/serverActions/session/sessionMethods"
 import Link from "next/link"
-
+import { useRouter } from "next/navigation"; // ✅ Utilisation du router Next.js
+import { isPrivatePage } from "@/lib/serverActions/session/sessionMethods"
+import { useAuth } from "@/app/AuthContext"
 export default function Dropdown() {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
-
+  const router = useRouter(); // ✅ Utilisation du router Next.js
+  
+  const {setIsAuthenticated} = useAuth()
+  
   // Fonction pour ouvrir ou fermer le dropdown
-  const toggleDropdown = () => {
+  function toggleDropdown() {
     setIsOpen(!isOpen)
   }
 
   // Fonction pour fermer le dropdown
-  const closeDropdown = () => {
+  function closeDropdown() {
     setIsOpen(false)
   }
+
+  
 
   // Gestion du clic à l'extérieur du dropdown
   useEffect(() => {
     function handleClickOutside(event) {
+      // Si je suis en dehors du dd
+      // Si je suis en dedans, soit je ne fais rien, soit j'ai cliqué sur le bouton pour le toggle
       if (!dropdownRef.current.contains(event.target)) {
         closeDropdown()
       }
@@ -34,13 +42,17 @@ export default function Dropdown() {
   }, [])
 
   async function handleLogout() {
-    await logout() // Appelle la Server Action pour supprimer la session
-
-    const currentPath = window.location.pathname // Chemin actuel de la page
-    if (isPrivatePage(currentPath)) {
-      window.location.href = "/signin" // Redirige si sur une page privée
+    await logOut(); // Appelle la Server Action pour supprimer la session
+  
+    setIsAuthenticated({ loading: false, isConnected: false });
+  
+    const currentPath = window.location.pathname; // Chemin actuel de la page
+    const isPrivate = await isPrivatePage(currentPath); // Attendre ici
+  
+    if (isPrivate) {
+      router.push("/signin"); // ✅ Redirection fluide sans rechargement
     } else {
-      console.log("Vous êtes déconnecté.")
+      console.log("Vous êtes déconnecté.");
     }
   }
 

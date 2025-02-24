@@ -7,15 +7,9 @@ export default function SignupPage() {
   const serverInfoRef = useRef(null) // Utilisation de useRef pour gérer l'erreur
   const submitButtonRef = useRef(null)
 
-  const handleSubmit = async e => {
+  async function handleSubmit(e) {
     e.preventDefault()
     serverInfoRef.current.textContent = "" // Reset error message
-    console.log(new FormData(e.target))
-    console.log(e.target)
-
-    for (const [key, value] of new FormData(e.target).entries()) {
-      console.log(key, value)
-    }
 
     submitButtonRef.current.textContent = "Saving User..."
     submitButtonRef.current.disabled = true

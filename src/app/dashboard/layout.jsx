@@ -1,14 +1,9 @@
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import { validateSession } from "@/lib/server/session/sessionMethods"
-
-export default async function RootLayout({ children }) {
-  // Récupérer le cookie de session
-  const cookieStore = cookies()
-  const sessionId = cookieStore.get("sessionId")?.value
-
+import { sessionInfo } from "@/lib/server/session/sessionMethods"
+export default async function Layout({ children }) {
   // Valider la session
-  const userId = await validateSession(sessionId)
+  const {userId} = await sessionInfo()
 
   if (!userId) {
     redirect("/signin") // Redirige si la session est invalide

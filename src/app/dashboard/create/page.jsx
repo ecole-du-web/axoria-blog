@@ -14,28 +14,35 @@ export default function Page() {
   function handleAddTag(e) {
     e.preventDefault() // car c'est un bouton dans un formulaire, donc on ne veut pas le submit
     const newTag = tagInputRef.current.value.trim().toLowerCase()
-    console.log(tags.length)
 
     if (newTag !== "" && !tags.includes(newTag) && tags.length <= 4) {
       setTags([...tags, newTag])
       tagInputRef.current.value = "" // Réinitialisation de l'input
     }
   }
-  // console.log(validation)
 
   function handleRemoveTag(tagToRemove) {
     setTags(tags.filter(tag => tag !== tagToRemove))
   }
 
+  function handleEnterOnTagInput(e) {
+    if (e.key === "Enter") {
+      e.preventDefault() // Empêche le submit du formulaire
+      handleAddTag(e) // Appelle la fonction pour ajouter un tag
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
+
+    // Oui, FormData gère automatiquement le type MIME, encode les fichiers, et structure le tout en multipart/form-data prêt à être envoyé.
+    //Exactement, FormData est particulièrement utile pour gérer et envoyer des fichiers médias comme images, vidéos, ou archives (zip), ainsi que des formulaires complexes avec plusieurs types de champs.
+    // Exactement ! Le rapport avec le MIME est que FormData détecte automatiquement les types de fichiers (via leurs métadonnées comme file.type pour une image ou un zip) et les encode en conséquence si nécessaire, en suivant le standard multipart/form-data.
+    // données binaires ou données complexes. Désigne les fichiers médias (images, vidéos, audio, fichiers ZIP, etc.) qui ne sont pas directement lisibles en texte brut.
     const formData = new FormData(e.target)
 
     formData.set("tags", JSON.stringify(tags)) // Il faut convertir les objets ou tableaux en chaînes pour les passer dans formData
 
-    // for (let [key, value] of formData.entries()) {
-    //   console.log(key, value)
-    // }
     serverValidationText.current.textContent = "" // reset potentiel du texte affiché retour du serveur
     submitButtonRef.current.textContent = "Saving Post..."
     submitButtonRef.current.disabled = true
@@ -54,6 +61,8 @@ export default function Page() {
 
           if (countdown === 0) {
             clearInterval(interval) // Arrête l'intervalle
+            console.log("PUSH IT",`/article/${result.slug}`);
+            
             router.push(`/article/${result.slug}`) // Redirige
           }
         }, 1000) // Met à jour toutes les secondes (1000 ms)
@@ -67,11 +76,10 @@ export default function Page() {
 
   function handleFileChange(e) {
     const file = e.target.files[0]
-    const fileType = file.type
     const validImageTypes = ["image/jpeg", "image/png", "image/webp"]
 
     // Vérifie si le fichier est de type image
-    if (!validImageTypes.includes(fileType)) {
+    if (!validImageTypes.includes(file.type)) {
       imgUploadValidationText.current.textContent =
         "Please upload a valid image (JPEG, PNG, or WebP)."
       e.target.value = "" // Réinitialise l'input de fichier
@@ -99,15 +107,10 @@ export default function Page() {
     img.src = URL.createObjectURL(file) // déclenche le chargement et donc l'écouteur de load
   }
 
-  function handleEnterOnTagInput(e){
-    if (e.key === "Enter") {
-      e.preventDefault(); // Empêche le submit du formulaire
-      handleAddTag(e); // Appelle la fonction pour ajouter un tag
-    }
-  }
-
   return (
     <main className="u-main-container  bg-white p-7 mt-12 mb-44">
+    
+
       <h1 className="text-4xl mb-4">Write an article 📝</h1>
       {/* 
       si on veut juste envoyer un simple post sans tags
