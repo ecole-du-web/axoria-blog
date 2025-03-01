@@ -5,9 +5,12 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'pull-zone-axoriablog.b-cdn.net',
-        pathname: '/**', // Accepte toutes les images de ce domaine
+        pathname: '/**',
       },
     ],
+  },
+  env: {
+    NEXT_PUBLIC_SITE_URL: 'https://axoria-blog.vercel.app', // URL de ton site en production
   },
 };
 
