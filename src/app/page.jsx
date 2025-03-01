@@ -4,6 +4,10 @@
 */
 import BlogCard from "@/components/BlogCard"
 import { getPosts } from "@/lib/server/blog/postMethods"
+
+// export const dynamic = "force-dynamic"; // Rend la page toujours dynamique
+export const revalidate = 60; // Régénère toutes les 60s, comme ça, pendant 60s la même page est servie du cache de next, au lieu de faire plein de requêtes à la db, on peut ensuite prévenir le userquand il crée un article en lui disant qu'il sera visible dans 1 min
+
 export default async function Home() {
   const posts = await getPosts()
 

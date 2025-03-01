@@ -4,11 +4,8 @@ import { getUserPostsFromSessionID } from "@/lib/server/blog/postMethods"
 import DeletePostButton from "./(components)/DeletePostButton"
 import { sessionInfo } from "@/lib/server/session/sessionMethods"
 
-export default async function page() {
-
-  // Récupérer userId, pas besoin de valider car on check déjà dans le alyout
-  const {userId} = await sessionInfo()
-
+export default async function page({ params }) {
+  const { userId } = await params
 
   const posts = await getUserPostsFromSessionID(userId) // Récupère les articles de l'utilisateur connecté
   
@@ -25,7 +22,7 @@ export default async function page() {
             >
               <Link
                 className="mr-auto underline underline-offset-2 text-violet-600"
-                href={`article/${post.title}`}
+                href={`/article/${post.slug}`}
               >
                 {post.title}
               </Link>

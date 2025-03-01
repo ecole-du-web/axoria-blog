@@ -40,23 +40,25 @@ const postSchema = new mongoose.Schema(
 // Slug à changer quand on modifie un article ?
 
 // middleware qui s'execute lors d'un document créé à partir d'un modèle, avant la sauvegarde
-postSchema.pre("save", async function (next) {
-  if (!this.slug) {
-    let slugCandidate = slugify(this.title, { lower: true, strict: true });
+// postSchema.pre("save", async function (next) {
+//   if (this.isModified("title")) { // ✅ Vérifie si le titre a changé
+//     console.log("SLUG MAJ HERE")
+//     let slugCandidate = slugify(this.title, { lower: true, strict: true });
 
-    let slugExists = await mongoose.models.Post.findOne({ slug: slugCandidate });
+//     let slugExists = await mongoose.models.Post.findOne({ slug: slugCandidate });
 
-    let counter = 1;
-    while (slugExists) {
-      slugCandidate = `${slugCandidate}-${counter}`;
-      slugExists = await mongoose.models.Post.findOne({ slug: slugCandidate });
-      counter++;
-    }
+//     let counter = 1;
+//     while (slugExists) {
+//       slugCandidate = `${slugCandidate}-${counter}`;
+//       slugExists = await mongoose.models.Post.findOne({ slug: slugCandidate });
+//       counter++;
+//     }
 
-    this.slug = slugCandidate;
-  }
-  next();
-});
+//     this.slug = slugCandidate; // ✅ Met à jour le slug
+//   }
+//   next();
+// });
+
 
 // Crée une instance du modèle Post à partir du schéma postSchema.
 // Si le modèle existe déjà (dans le cache de Mongoose, via mongoose.models), il le réutilise.

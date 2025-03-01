@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { getTags } from "@/lib/server/blog/tagMethods"
 
+export const revalidate = 60; // Régénère toutes les 60s, comme ça, pendant 60s la même page est servie du cache de next, au lieu de faire plein de requêtes à la db, on peut ensuite prévenir le userquand il crée un article en lui disant qu'il sera visible dans 1 min
+
 export default async function Page() {
   const tags = await getTags() // Récupération des tags
   console.log(tags, "tagsConsole");

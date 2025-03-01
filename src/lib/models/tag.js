@@ -25,3 +25,4 @@ const tagSchema = new mongoose.Schema({
 
 // Cette structure permet d’éviter l’erreur : "Cannot overwrite Tag model once compiled", courante dans les environnements où les modules sont rechargés dynamiquement.
 export const Tag = mongoose.models?.Tag || mongoose.model("Tag", tagSchema);
+

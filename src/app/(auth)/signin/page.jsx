@@ -23,7 +23,7 @@ export default function Page() {
       const result = await login(new FormData(e.target))
 
       if (result.success) {
-        setIsAuthenticated({ loading: false, isConnected: true })
+        setIsAuthenticated({ loading: false, isConnected: true, userId: result.userId })
         router.push("/") // Redirige vers la page d'accueil si succès
       }
     } catch (err) {

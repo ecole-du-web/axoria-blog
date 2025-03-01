@@ -8,7 +8,7 @@ import Image from "next/image"
 export default function Navbar() {
   const { isAuthenticated } = useAuth()
 
-  console.log(isAuthenticated)
+  // console.log("kkkkkkkkk", isAuthenticated)
 
   return (
     <nav className=" w-full bg-slate-50 border-b border-b-zinc-300">
@@ -36,7 +36,7 @@ export default function Navbar() {
             <Link className="mr-4 text-zinc-900" href="/dashboard/create">
               Add an article
             </Link>
-            <NavbarDropdown />
+            <NavbarDropdown userId={isAuthenticated.userId}/>
           </>
         )}
 

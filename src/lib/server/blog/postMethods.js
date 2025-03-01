@@ -8,46 +8,112 @@ import { User } from "@/lib/models/user";
 
 import { notFound } from "next/navigation";
 
+/*
+Pour résumer, deux caches possibles : 
+- le retour d'une méthode serveur 
+- le cache d'une page statique
 
-// Fonction sans unstable_cache
-export async function getPosts() {
-  try {
+Une page statique est cachée et redistribuée à chaque call.
+On peut la reconstruire grâce à revalidatePath(maPage), qui reconstruit la page ou revalidateTag.
+Pour la reconstruire avec revalidateTag, il faut la "lier" à une méthode qu'elle utilise;
+C'est à dire qu'il faut entourer une méthode serveur qu'elle utilise d'un unstable cache avec un argument tag.
+Cela permettra de reconstruire la page ET le retour de la méthode cachée au revalidateTag.
+Le tag peut être attaché à toutes les pages qui utilisent la méthode cachée, et donc toute revalider d'un coup.
+
+Une page statique quant à elle, va toujours être créé à chaque requêtE.
+Mais on peut quand même cacher le résultat d'une fonction qu'elle utilise.
+Le mieux est donc de créer un tag unique par retour de fonction, via l'argument de la méthode.
+Puis on peut revalider ce tag quand on modifie un article par exemple.
+
+*/
+
+export async function getPosts (){
     await connectToDB();
     const posts = await Post.find({})
       .populate("author", "userName normalizedUserName") // Peupler `author` avec seulement `userName`
       .select("title coverImageUrl slug createdAt updatedAt"); // Sélectionner les champs nécessaires
 
     return posts;
-  } catch (err) {
-    console.error("Error fetching posts:", err);
-    throw new Error("Failed to fetch posts!");
-  }
-};
-
-
-export async function getPost(slug) {
-  try {
-    await connectToDB();
-
-    // Récupérer l'objet Mongoose
-    const post = await Post.findOne({ slug })
-      .populate({
-        path: "author", // Enrichit l'objet `author`
-        select: "userName normalizedUserName", // Inclut les champs nécessaires depuis User
-      })
-      .populate({
-        path: "tags",
-        select: "name slug", // Inclut le champ `name` depuis Tag
-      })
-    // .lean(); // check ça
-    if (!post) return notFound();
-    return post
-  } catch (err) {
-    console.error("Error fetching post:", err);
-    throw new Error("Failed to fetch post!");
-  }
 }
+// export const getPosts = unstable_cache(
+//   async () => {
+//     await connectToDB();
+//     const posts = await Post.find({})
+//       .populate("author", "userName normalizedUserName") // Peupler `author` avec seulement `userName`
+//       .select("title coverImageUrl slug createdAt updatedAt"); // Sélectionner les champs nécessaires
 
+//     return posts;
+//   },
+//   // [], // Pas besoin de clé de cache supplémentaire, pas d'argument dynamique 
+//   // { tags: ["posts"], revalidate: 60 } // Tag pour invalidation et cache pendant 60s
+//   { tags: ["posts"] }
+// );
+
+// 📌 Pourquoi c’est important ?
+// 1️⃣ Si tu utilises seulement keyParts ([userId])
+
+// ✅ Chaque utilisateur a son propre cache.
+// ❌ Mais tu ne peux pas supprimer un cache précis facilement.
+// ❌ Il faut attendre l’expiration du cache (revalidate) ou utiliser unstable_noStore().
+// 2️⃣ Si tu utilises tags sans keyParts
+
+// ✅ Tu peux invalider un groupe de caches avec revalidateTag().
+// ❌ Mais tous les utilisateurs partageraient le même cache, ce qui est un problème si chaque user doit avoir ses propres données en cache.
+// 3️⃣ Si tu combines les deux (keyParts + tags)
+
+// ✅ Chaque utilisateur a son propre cache (keyParts).
+// ✅ Tu peux réinitialiser des caches ciblés (tags).
+
+
+
+// Fonction sans unstable_cache
+// export async function getPosts() {
+//   await connectToDB();
+//   const posts = await Post.find({})
+//     .populate("author", "userName normalizedUserName") // Peupler `author` avec seulement `userName`
+//     .select("title coverImageUrl slug createdAt updatedAt"); // Sélectionner les champs nécessaires
+
+//   return posts;
+
+// };
+
+
+export const getPost = unstable_cache(async (slug) => {
+  await connectToDB();
+
+  // Récupérer l'objet Mongoose
+  const post = await Post.findOne({ slug })
+    .populate({
+      path: "author", // Enrichit l'objet `author`
+      select: "userName normalizedUserName", // Inclut les champs nécessaires depuis User
+    })
+    .populate({
+      path: "tags",
+      select: "name slug", // Inclut le champ `name` depuis Tag
+    })
+  // .lean(); // check ça
+  if (!post) return notFound();
+  return post
+}, {tags: [`post-${slug}`]})
+
+
+// export async function getPost(slug) {
+//   await connectToDB();
+
+//   // Récupérer l'objet Mongoose
+//   const post = await Post.findOne({ slug })
+//     .populate({
+//       path: "author", // Enrichit l'objet `author`
+//       select: "userName normalizedUserName", // Inclut les champs nécessaires depuis User
+//     })
+//     .populate({
+//       path: "tags",
+//       select: "name slug", // Inclut le champ `name` depuis Tag
+//     })
+//   // .lean(); // check ça
+//   if (!post) return notFound();
+//   return post
+// }
 
 
 export async function getUserPostsFromSessionID(userId) {

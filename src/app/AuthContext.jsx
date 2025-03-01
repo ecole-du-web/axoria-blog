@@ -8,12 +8,13 @@ export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState({
     loading: true,
     isConnected: false,
+    userId : undefined
   }) // null = en chargement
 
   useEffect(() => {
     async function fetchAuthStatus() {
       const authStatus = await SASessionInfo()
-      setIsAuthenticated({ loading: false, isConnected: authStatus.success })
+      setIsAuthenticated({ loading: false, isConnected: authStatus.success, userId: authStatus.userId })
     }
     fetchAuthStatus()
   }, [])

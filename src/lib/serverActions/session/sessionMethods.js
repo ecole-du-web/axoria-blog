@@ -151,7 +151,7 @@ export async function login(formData) {
       sameSite: "Lax" // Attaques CSRF // ça bloque l'envoi des cookies vers d'autre domaine que le domaine ouvert sur le navigateur
     })
 
-    return { success: true }
+    return { success: true, userId: user._id.toString() }
 
   }
   catch (error) {
@@ -213,7 +213,6 @@ export async function SASessionInfo() {
   // Lire le cookie 'sessionId'
   const cookieStore = await cookies();
   const sessionId = cookieStore.get("sessionId")?.value;
-
   if (!sessionId) {
     return { success: false };
     // Pas de session, donc pas d'utilisateur connecté
@@ -236,6 +235,7 @@ export async function SASessionInfo() {
   if (!user) {
     return { success: false };
   }
+  console.log({ success: true, userId: user._id.toString() })
 
   return { success: true, userId: user._id.toString() };
 

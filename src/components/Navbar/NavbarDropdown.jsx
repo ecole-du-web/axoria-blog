@@ -6,7 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"; // ✅ Utilisation du router Next.js
 import { isPrivatePage } from "@/lib/serverActions/session/sessionMethods"
 import { useAuth } from "@/app/AuthContext"
-export default function Dropdown() {
+export default function Dropdown({userId}) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
   const router = useRouter(); // ✅ Utilisation du router Next.js
@@ -76,7 +76,7 @@ export default function Dropdown() {
             onClick={closeDropdown}
             className="bg-slate-50 hover:bg-slate-200"
           >
-            <Link className="block p-4" href="/dashboard">
+            <Link className="block p-4" href={`/dashboard/${userId}`}>
               Dashboard
             </Link>
           </li>

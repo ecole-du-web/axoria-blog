@@ -3,15 +3,16 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { editPost } from "@/lib/serverActions/blog/postServerActions"
 
-export default function Page({ post }) {
-  const [tags, setTags] = useState(post.tags.map(tag => tag.name))
-  
+// Il faut créer une page serveur pour récupérer le post
+export default function Page({ post }) { // récupérer le post
+  console.log(post);
+  const [tags, setTags] = useState(post.tags.map(tag => tag.name)) // différent, ajouter les tags depuis post
   const router = useRouter()
 
   const tagInputRef = useRef(null) // Utilisation d'une ref
-  const submitButtonRef = useRef(null) // Utilisation d'une ref
   const imgUploadValidationText = useRef(null) // Utilisation d'une ref
-  const globalValidationRef = useRef(null) // On l'appelle global et pas server ici car on l'utilise en front et en back.
+  const submitButtonRef = useRef(null) // Utilisation d'une ref
+  const serverValidationText = useRef(null) // On l'appelle global et pas server ici car on l'utilise en front et en back.
 
   function handleAddTag(e) {
     e.preventDefault() // car c'est un bouton dans un formulaire, donc on ne veut pas le submit
@@ -27,6 +28,13 @@ export default function Page({ post }) {
     setTags(tags.filter(tag => tag !== tagToRemove))
   }
 
+  function handleEnterOnTagInput(e) {
+    if (e.key === "Enter") {
+      e.preventDefault() // Empêche le submit du formulaire
+      handleAddTag(e) // Appelle la fonction pour ajouter un tag
+    }
+  }
+  // Jusque ici quasi totalement similaire
   async function handleSubmit(e) {
     e.preventDefault()
     const formData = new FormData(e.target)
@@ -35,32 +43,40 @@ export default function Page({ post }) {
     const readableFormData = Object.fromEntries(formData)
     const areSameTags = areTagsSimilar(tags, post.tags)
     
-    if(readableFormData.title === post.title && readableFormData.markdownArticle === post.markdownArticle && areSameTags) {
-      globalValidationRef.current.textContent = "You must make a change before submitting."
+    // Rajoute les trims dans le save de la bdd à ce moment là
+    // On vérifie s'il y a quelque chose dans l'input file
+    console.log(readableFormData);
+    
+    console.log(formData.get("coverImage").size === 0, readableFormData.title.trim() === post.title, readableFormData.markdownArticle.trim() === post.markdownArticle && areSameTags);
+    
+    if(formData.get("coverImage").size === 0 && readableFormData.title.trim() === post.title && readableFormData.markdownArticle.trim() === post.markdownArticle && areSameTags) {
+      serverValidationText.current.textContent = "You must make a change before submitting."
       return 
     } else {
-      globalValidationRef.current.textContent = ""
+      serverValidationText.current.textContent = ""
     }
 
 
     formData.set("tags", JSON.stringify(tags)) // Ajoute les potentiels nouveau tag tags au formData
-    formData.set("slug", post.slug) // pour retrouver l'article
+    formData.set("slug", post.slug) // pour retrouver l'article avec getPost qui attend un slug
 
 
     submitButtonRef.current.textContent = "Updating Post..."
     submitButtonRef.current.disabled = true
 
     try {
+      console.log(Object.fromEntries(formData));
+      
       const result = await editPost(formData) // Appelle la fonction `editPost` avec les données du formulaire
-
+      console.log(result, "resultlàààààààà");
       if (result.success) {
         submitButtonRef.current.textContent = "Post updated ✅"
         // Optionnel : redirection ou affichage de succès ici
         let countdown = 3 // Le nombre de secondes avant redirection
-        globalValidationRef.current.textContent = `Redirecting in ${countdown}...`
+        serverValidationText.current.textContent = `Redirecting in ${countdown}...`
         const interval = setInterval(() => {
           countdown -= 1
-          globalValidationRef.current.textContent = `Redirecting in ${countdown}...`
+          serverValidationText.current.textContent = `Redirecting in ${countdown}...`
 
           if (countdown === 0) {
             clearInterval(interval) // Arrête l'intervalle
@@ -71,24 +87,25 @@ export default function Page({ post }) {
     } catch (error) {
       submitButtonRef.current.textContent = "Submit"
       submitButtonRef.current.disabled = false
-      globalValidationRef.current.textContent = `${error.message}`
+      serverValidationText.current.textContent = `${error.message}`
     }
   }
 
   function areTagsSimilar(arr1, arr2) {
-    // Attention il faut passer le state en premier arg, puis le tableau de tags qui sont des objets en second
-    if (arr1.length !== arr2.length) return false; // Différente taille, forcément faux
+    if (arr1.length !== arr2.length) return false;
+    
+    const sortedArr1 = [...arr1].sort(); // Trie pour éviter l'ordre différent
+    const sortedArr2 = arr2.map(tag => tag.name).sort();
   
-    return arr1.every((str, i) => str === arr2[i].name);
+    return sortedArr1.every((tag, i) => tag === sortedArr2[i]);
   }
 
   function handleFileChange(e) {
     const file = e.target.files[0]
-    const fileType = file.type
     const validImageTypes = ["image/jpeg", "image/png", "image/webp"]
 
     // Vérifie si le fichier est de type image
-    if (!validImageTypes.includes(fileType)) {
+    if (!validImageTypes.includes(file.type)) {
       imgUploadValidationText.current.textContent =
         "Please upload a valid image (JPEG, PNG, or WebP)."
       e.target.value = "" // Réinitialise l'input de fichier
@@ -158,6 +175,7 @@ export default function Page({ post }) {
               type="text"
               placeholder="Add a tag"
               ref={tagInputRef}
+              onKeyDown={handleEnterOnTagInput}
             />
             <button
               className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold p-4 rounded ml-4 mr-4 border-none"
@@ -211,7 +229,7 @@ export default function Page({ post }) {
         >
           Submit
         </button>
-        <p ref={globalValidationRef} className="text-xl"></p>
+        <p ref={serverValidationText} className="text-xl"></p>
       </form>
     </main>
   )
