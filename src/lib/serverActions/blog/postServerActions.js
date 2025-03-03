@@ -319,9 +319,15 @@ export const editPost = async (formData) => {
     // new: true renvoie le nouveau document, sinon ça envoie l'ancien
     const updatedPost = await Post.findByIdAndUpdate(postId, updateData, { new: true });
     console.log(updatedPost)
-    // setTimeout(() => {
-      revalidatePath(`/article/${slug}`)
+
+    // setTimeout(() => { // bug seulement en developpement
+    // revalidatePath(`/article/${slug}`)
     // })
+    setTimeout(() => {
+
+      revalidatePath(`/article/${slug}`); // Invalide l'ancien slug
+      revalidatePath(`/article/${updatedPost.slug}`); // Force la régénération du nouveau slug
+    }, 0)
 
     // return { success: true, slug: updatedPost.slug };
     return { success: true, slug: updatedPost.slug };

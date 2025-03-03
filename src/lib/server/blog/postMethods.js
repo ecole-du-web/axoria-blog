@@ -35,6 +35,7 @@ export async function getPosts() {
 
   return posts;
 }
+
 // export const getPosts = unstable_cache(
 //   async () => {
 //     await connectToDB();

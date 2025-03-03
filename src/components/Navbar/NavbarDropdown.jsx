@@ -57,7 +57,7 @@ export default function Dropdown({userId}) {
   }
 
   return (
-    <div ref={dropdownRef} className="relative">
+    <div ref={dropdownRef} className="relative z-50">
       <button
         onClick={toggleDropdown}
         aria-label="toggle dropdown"

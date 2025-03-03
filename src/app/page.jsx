@@ -1,16 +1,14 @@
-/* 
-1. Au début utilise des données locales avec tableau et tout ce qu'il faut, auteur, titre, etc
-2. Déplace getPosts en SA, ou commence directement les SA avec Mongo
-*/
+
 import BlogCard from "@/components/BlogCard"
 import { getPosts } from "@/lib/server/blog/postMethods"
 
-// export const dynamic = "force-dynamic"; // Rend la page toujours dynamique
-export const revalidate = 60; // Régénère toutes les 60s, comme ça, pendant 60s la même page est servie du cache de next, au lieu de faire plein de requêtes à la db, on peut ensuite prévenir le userquand il crée un article en lui disant qu'il sera visible dans 1 min
+export const revalidate = 60;
 
 export default async function Home() {
+  console.log("Rendering Home page...");
   const posts = await getPosts()
-
+  console.log(posts);
+  
   return (
     <div className="u-main-container u-padding-content-container">
       <h1 className="t-main-title">Stay up to date with AXORIA.</h1>
