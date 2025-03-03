@@ -190,11 +190,12 @@ export default nextConfig;
 
     // Sauvegarder le post dans la base de données
     const savedPost = await newPost.save();
-    
-    // Page statiques revalidées
-    if(tagIds.length !== 0) revalidatePath("/categories")
 
+    //     // Page statiques revalidées
+    //     if(tagIds.length !== 0) revalidatePath("/categories")
 
+    // revalidatePath("/")
+    // revalidateTag("/")
 
 
     return { success: true, slug: savedPost.slug };
@@ -213,7 +214,6 @@ export default nextConfig;
 
 export const editPost = async (formData) => {
   const { slug, title, markdownArticle, coverImage, tags } = Object.fromEntries(formData);
-  console.log(typeof coverImage, coverImage, "aaazzz")
   try {
     await connectToDB();
 
@@ -227,8 +227,6 @@ export const editPost = async (formData) => {
     const existingPost = await getPost(slug);
     if (!existingPost) throw new AppError("Original post not found");
 
-    const postId = existingPost._id;
-
 
 
     // Initialiser l'objet de mise à jour
@@ -238,12 +236,10 @@ export const editPost = async (formData) => {
     if (typeof title !== "string") throw new AppError("Invalid data");
     if (title.trim() !== existingPost.title) {
       updateData.title = title;
-      updateData.slug  = await generateUniqueSlug(title, existingPost._id);
-      console.log("xyyyyyyyyyyyz",updateData.slug)
+      updateData.slug = await generateUniqueSlug(title, existingPost._id);
 
     }
 
-    console.log(typeof markdownArticle === "string", markdownArticle, existingPost.markdownArticle, markdownArticle !== existingPost.markdownArticle)
     if (typeof markdownArticle !== "string") throw new AppError("Invalid data");
 
     // Vérifier si la description a changé
@@ -324,20 +320,25 @@ export const editPost = async (formData) => {
     }
 
     // Mettre à jour l'article dans MongoDB
+    console.log(existingPost.slug, updateData.slug, "jkljmj")
+    const postId = existingPost._id;
+    console.log(postId)
     // new: true renvoie le nouveau document, sinon ça envoie l'ancien
     const updatedPost = await Post.findByIdAndUpdate(postId, updateData, { new: true });
-    console.log(updatedPost, "zzaaa")
+    console.log(updatedPost)
+    // setTimeout(() => {
+      // revalidateTag(`post-${slug}`) // on détruit le cache de l'ancien article, pour que ça retourne 404 si on essaye de retourner dessus
+      revalidatePath(`/article/${slug}`)
+    // })
 
-
-    revalidateTag(`post-${slug}`) // on détruit le cache de l'ancien article, pour que ça retourne 404 si on essaye de retourner dessus
-
+    // return { success: true, slug: updatedPost.slug };
     return { success: true, slug: updatedPost.slug };
 
   } catch (error) {
     if (error instanceof AppError) {
       throw error
     }
-    console.error(error.message)
+    console.error(error)
     throw new Error("An error occured while updating the post")
   }
 };
@@ -375,12 +376,13 @@ export async function deletePost(id) {
         throw new AppError(`Failed to delete image: ${response.statusText}`);
       }
     }
-    revalidateTag(`post-${slug}`)
+    revalidateTag(`post-${post.slug}`)
 
   } catch (error) {
     if (error instanceof AppError) {
       throw error;
     }
+    console.error(error)
     throw new Error("An error occurred while deleting the post.");
   }
 }

@@ -27,13 +27,13 @@ Puis on peut revalider ce tag quand on modifie un article par exemple.
 
 */
 
-export async function getPosts (){
-    await connectToDB();
-    const posts = await Post.find({})
-      .populate("author", "userName normalizedUserName") // Peupler `author` avec seulement `userName`
-      .select("title coverImageUrl slug createdAt updatedAt"); // Sélectionner les champs nécessaires
+export async function getPosts() {
+  await connectToDB();
+  const posts = await Post.find({})
+    .populate("author", "userName normalizedUserName") // Peupler `author` avec seulement `userName`
+    .select("title coverImageUrl slug createdAt updatedAt"); // Sélectionner les champs nécessaires
 
-    return posts;
+  return posts;
 }
 // export const getPosts = unstable_cache(
 //   async () => {
@@ -66,40 +66,12 @@ export async function getPosts (){
 
 
 
-// Fonction sans unstable_cache
-// export async function getPosts() {
-//   await connectToDB();
-//   const posts = await Post.find({})
-//     .populate("author", "userName normalizedUserName") // Peupler `author` avec seulement `userName`
-//     .select("title coverImageUrl slug createdAt updatedAt"); // Sélectionner les champs nécessaires
 
-//   return posts;
-
-// };
-
-
-export const getPost = unstable_cache(async (slug) => {
-  await connectToDB();
-
-  // Récupérer l'objet Mongoose
-  const post = await Post.findOne({ slug })
-    .populate({
-      path: "author", // Enrichit l'objet `author`
-      select: "userName normalizedUserName", // Inclut les champs nécessaires depuis User
-    })
-    .populate({
-      path: "tags",
-      select: "name slug", // Inclut le champ `name` depuis Tag
-    })
-  // .lean(); // check ça
-  if (!post) return notFound();
-  return post
-}, {tags: [`post-${slug}`]})
 
 
 // export async function getPost(slug) {
 //   await connectToDB();
-
+//   console.log("DANS GET POST Là SANS CACHE")
 //   // Récupérer l'objet Mongoose
 //   const post = await Post.findOne({ slug })
 //     .populate({
@@ -111,9 +83,31 @@ export const getPost = unstable_cache(async (slug) => {
 //       select: "name slug", // Inclut le champ `name` depuis Tag
 //     })
 //   // .lean(); // check ça
+//   console.log(post, "ICILA")
 //   if (!post) return notFound();
 //   return post
 // }
+
+export const getPost = unstable_cache(
+  async (slug) => {
+    console.log("DANS GET POST Là")
+    await connectToDB();
+    const post = await Post.findOne({ slug })
+      .populate({ path: "author", select: "userName normalizedUserName" })
+      .populate({ path: "tags", select: "name slug" });
+
+    if (!post) return notFound();
+    return post;
+  }
+);
+
+
+
+
+
+
+
+
 
 
 export async function getUserPostsFromSessionID(userId) {
