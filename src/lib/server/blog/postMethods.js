@@ -69,37 +69,33 @@ export async function getPosts() {
 
 
 
-// export async function getPost(slug) {
-//   await connectToDB();
-//   console.log("DANS GET POST Là SANS CACHE")
-//   // Récupérer l'objet Mongoose
-//   const post = await Post.findOne({ slug })
-//     .populate({
-//       path: "author", // Enrichit l'objet `author`
-//       select: "userName normalizedUserName", // Inclut les champs nécessaires depuis User
-//     })
-//     .populate({
-//       path: "tags",
-//       select: "name slug", // Inclut le champ `name` depuis Tag
-//     })
-//   // .lean(); // check ça
-//   console.log(post, "ICILA")
-//   if (!post) return notFound();
-//   return post
-// }
+export async function getPost(slug) {
+  await connectToDB();
+  const post = await Post.findOne({ slug })
+    .populate({
+      path: "author", // Enrichit l'objet `author`
+      select: "userName normalizedUserName", // Inclut les champs nécessaires depuis User
+    })
+    .populate({
+      path: "tags",
+      select: "name slug", // Inclut le champ `name` depuis Tag
+    })
+  if (!post) return notFound();
+  return post
+}
 
-export const getPost = unstable_cache(
-  async (slug) => {
-    console.log("DANS GET POST Là")
-    await connectToDB();
-    const post = await Post.findOne({ slug })
-      .populate({ path: "author", select: "userName normalizedUserName" })
-      .populate({ path: "tags", select: "name slug" });
+// export const getPost = unstable_cache(
+//   async (slug) => {
+//     console.log("DANS GET POST Là")
+//     await connectToDB();
+//     const post = await Post.findOne({ slug })
+//       .populate({ path: "author", select: "userName normalizedUserName" })
+//       .populate({ path: "tags", select: "name slug" });
 
-    if (!post) return notFound();
-    return post;
-  }
-);
+//     if (!post) return notFound();
+//     return post;
+//   }
+// );
 
 
 

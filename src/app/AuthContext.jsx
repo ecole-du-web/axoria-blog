@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     async function fetchAuthStatus() {
       const authStatus = await SASessionInfo()
+      
       setIsAuthenticated({ loading: false, isConnected: authStatus.success, userId: authStatus.userId })
     }
     fetchAuthStatus()

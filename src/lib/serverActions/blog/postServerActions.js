@@ -191,13 +191,6 @@ export default nextConfig;
     // Sauvegarder le post dans la base de données
     const savedPost = await newPost.save();
 
-    //     // Page statiques revalidées
-    //     if(tagIds.length !== 0) revalidatePath("/categories")
-
-    // revalidatePath("/")
-    // revalidateTag("/")
-
-
     return { success: true, slug: savedPost.slug };
   } catch (error) {
 
@@ -327,7 +320,6 @@ export const editPost = async (formData) => {
     const updatedPost = await Post.findByIdAndUpdate(postId, updateData, { new: true });
     console.log(updatedPost)
     // setTimeout(() => {
-      // revalidateTag(`post-${slug}`) // on détruit le cache de l'ancien article, pour que ça retourne 404 si on essaye de retourner dessus
       revalidatePath(`/article/${slug}`)
     // })
 
@@ -376,8 +368,7 @@ export async function deletePost(id) {
         throw new AppError(`Failed to delete image: ${response.statusText}`);
       }
     }
-    revalidateTag(`post-${post.slug}`)
-
+    revalidatePath(`article/${post.slug}`)
   } catch (error) {
     if (error instanceof AppError) {
       throw error;
