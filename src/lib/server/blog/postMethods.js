@@ -81,6 +81,7 @@ export async function getPost(slug) {
       path: "tags",
       select: "name slug", // Inclut le champ `name` depuis Tag
     })
+    console.log("sdsmdkqsmd",post)
   if (!post) return notFound();
   return post
 }
@@ -129,9 +130,10 @@ export async function getPostsByAuthor(normalizedUserName) {
 
   // Étape 1 : Trouver l'auteur correspondant au `normalizedUserName`
   // Retourne un objet avec l'objectId de base, + ce qu'on select userName pour le passer à l'objet final et l'afficher sur la page, et normalizedUserName
-  const author = await User.findOne({ normalizedUserName }).select("userName");
+  const author = await User.findOne({ normalizedUserName });
+  console.log("zzeazeaeazeaze",author)
   if (!author) {
-    notFound()
+    return  notFound()
   }
 
   // Étape 2 : Trouver les articles pour cet auteur
@@ -174,3 +176,58 @@ export async function getPostsByTag(tagSlug) {
   return posts;
 }
 
+// A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+// - A server/client branch `if (typeof window !== 'undefined')`.
+// - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+// - Date formatting in a user's locale which doesn't match the server.
+// - External changing data without sending a snapshot of it along with the HTML.
+// - Invalid HTML tag nesting.
+
+// It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+// https://react.dev/link/hydration-mismatch
+
+//   ...
+//     <HotReload assetPrefix="">
+//       <ReactDevOverlay state={{nextId:1, ...}} dispatcher={{...}}>
+//         <DevRootHTTPAccessFallbackBoundary>
+//           <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+//             <HTTPAccessFallbackErrorBoundary pathname="/article/a..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+//               <RedirectBoundary>
+//                 <RedirectErrorBoundary router={{...}}>
+//                   <Head>
+//                   <link>
+//                   <RootLayout>
+//                     <html lang="en" className="h-full">
+//                       <link>
+//                       <meta>
+//                       <body
+//                         className="flex min-h-full flex-col"
+// -                       cz-shortcut-listen="true"
+//                       >
+//                   ...
+//         ...
+
+// overrideMethod @ hook.js:608Understand this errorAI
+// connectToDB.js:5  Server  Using existing connection: axoriablog
+// hook.js:608 Error: Rendered more hooks than during the previous render.
+//     at updateWorkInProgressHook (react-dom-client.development.js:4832:17)
+//     at updateMemo (react-dom-client.development.js:5728:18)
+//     at Object.useMemo (react-dom-client.development.js:22898:18)
+//     at exports.useMemo (react.development.js:1495:34)
+//     at Router (app-router.js:187:59)
+//     at react-stack-bottom-frame (react-dom-client.development.js:23610:20)
+//     at renderWithHooks (react-dom-client.development.js:4646:22)
+//     at updateFunctionComponent (react-dom-client.development.js:8032:19)
+//     at beginWork (react-dom-client.development.js:9689:18)
+//     at runWithFiberInDEV (react-dom-client.development.js:544:16)
+//     at performUnitOfWork (react-dom-client.development.js:15064:22)
+//     at workLoopSync (react-dom-client.development.js:14888:41)
+//     at renderRootSync (react-dom-client.development.js:14868:11)
+//     at performWorkOnRoot (react-dom-client.development.js:14394:44)
+//     at performWorkOnRootViaSchedulerTask (react-dom-client.development.js:15955:7)
+//     at MessagePort.performWorkUntilDeadline (scheduler.development.js:44:48)
+
+// The above error occurred in the <Router> component. It was handled by the <ErrorBoundaryHandler> error boundary. Error Component Stack
+//     at Router (app-router.js:183:11)

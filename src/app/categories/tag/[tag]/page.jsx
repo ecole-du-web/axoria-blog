@@ -2,7 +2,7 @@ import BlogCard from "@/components/BlogCard"
 
 import { getPostsByTag } from "@/lib/server/blog/postMethods"
 export default async function page({ params }) {
-  const { tag } = params
+  const { tag } = await params
   const posts = await getPostsByTag(tag)
   console.log(posts);
   

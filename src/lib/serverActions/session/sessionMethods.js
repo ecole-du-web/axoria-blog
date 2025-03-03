@@ -223,7 +223,6 @@ export async function SASessionInfo() {
 
   // Vérifier la session dans la base de données
   const session = await Session.findById(sessionId);
-  console.log(sessionId)
   if (!session || session.expiresAt < new Date()) {
     return { success: false };
     // Session invalide ou expirée

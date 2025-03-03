@@ -323,11 +323,11 @@ export const editPost = async (formData) => {
     // setTimeout(() => { // bug seulement en developpement
     // revalidatePath(`/article/${slug}`)
     // })
-    setTimeout(() => {
+    // setTimeout(() => {
 
       revalidatePath(`/article/${slug}`); // Invalide l'ancien slug
-      revalidatePath(`/article/${updatedPost.slug}`); // Force la régénération du nouveau slug
-    }, 0)
+    //   revalidatePath(`/article/${updatedPost.slug}`); // Force la régénération du nouveau slug
+    // }, 0)
 
     // return { success: true, slug: updatedPost.slug };
     return { success: true, slug: updatedPost.slug };

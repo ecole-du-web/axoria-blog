@@ -5,9 +5,7 @@ import { getPosts } from "@/lib/server/blog/postMethods"
 export const revalidate = 60;
 
 export default async function Home() {
-  console.log("Rendering Home page...");
   const posts = await getPosts()
-  console.log(posts);
   
   return (
     <div className="u-main-container u-padding-content-container">
