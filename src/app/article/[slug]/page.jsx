@@ -3,12 +3,11 @@ import Link from "next/link"
 import { getPost } from "@/lib/server/blog/postMethods"
 import 'prism-themes/themes/prism-vsc-dark-plus.css';
 import "./article-styles.css"
-// export async function generateStaticParams() {
-//   await connectToDB();
-//   const posts = await Post.find({}, "slug")
+import { Post } from "@/lib/models/post";
 
-//   return posts.map(post => ({ slug: post.slug }));
-// }
+export const dynamic = 'force-static'
+
+
 export default async function page({ params }) {
   const { slug } = await params
   const post = await getPost(slug)

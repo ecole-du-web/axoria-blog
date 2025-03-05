@@ -4,27 +4,28 @@ import { SASessionInfo } from "@/lib/serverActions/session/sessionMethods"
 
 const AuthContext = createContext(null)
 
-export function AuthProvider({ children }) {
+export function AuthProvider({ children, initialAuth }) {
+  
   const [isAuthenticated, setIsAuthenticated] = useState({
-    loading: true,
-    isConnected: false,
-    userId: undefined,
+    loading: false,
+    isConnected: initialAuth.success,
+    userId: initialAuth.userId,
   }) // null = en chargement
 
-  useEffect(() => {
-    console.log("iciiiiiiiiiiiiiii");
+  // useEffect(() => {
+  //   console.log("iciiiiiiiiiiiiiii");
     
-    async function fetchAuthStatus() {
-      const authStatus = await SASessionInfo()
+  //   async function fetchAuthStatus() {
+  //     const authStatus = await SASessionInfo()
 
-      setIsAuthenticated({
-        loading: false,
-        isConnected: authStatus.success,
-        userId: authStatus.userId,
-      })
-    }
-    fetchAuthStatus()
-  }, [])
+  //     setIsAuthenticated({
+  //       loading: false,
+  //       isConnected: authStatus.success,
+  //       userId: authStatus.userId,
+  //     })
+  //   }
+  //   fetchAuthStatus()
+  // }, [])
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>

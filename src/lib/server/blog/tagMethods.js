@@ -1,9 +1,10 @@
 import { connectToDB } from "@/lib/utils/db/connectToDB";
 import { Tag } from "@/lib/models/tag";
-import { Post } from "@/lib/models/post";
-import { unstable_cache } from 'next/cache';
 
-// Exactement, on gère le cache avec unstable_cache uniquement dans les méthodes qui récupèrent des données pour être affichées sur des routes, car c'est ce cache que Next.js utilise pour optimiser les réponses et revalider les routes liées. Les méthodes transactionnelles (CRUD) accèdent directement à la base de données et ne dépendent pas de ce mécanisme.
+
+// Une agrégation en MongoDB est une manière avancée de transformer et d’analyser les données en appliquant une série d’étapes (pipeline) sur une collection, comme des filtres, jointures, tris, calculs et regroupements, avant de renvoyer le résultat final. 🚀
+
+//  une jointure en MongoDB est un ensemble de données fusionnées provenant de plusieurs collections, généralement sous forme d'un tableau d'objets (ou d'un objet enrichi).
 // Fonction pour récupérer les tags
 export async function getTags() {
 
@@ -18,8 +19,8 @@ export async function getTags() {
       {
         $lookup: {
           from: "posts",           // Collection avec laquelle on fait la jointure (posts)
-          localField: "_id",       // Champ de "tags" utilisé pour la jointure (l'ID du tag)
           foreignField: "tags",    // Champ dans "posts" qui contient les références aux tags
+          localField: "_id",       // Champ de "tags" utilisé pour la jointure (l'ID du tag)
           as: "postsWithTag",      // Nom du tableau contenant les posts associés à chaque tag
         },
       },

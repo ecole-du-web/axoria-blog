@@ -81,10 +81,12 @@ export async function getPost(slug) {
       path: "tags",
       select: "name slug", // Inclut le champ `name` depuis Tag
     })
-    console.log("sdsmdkqsmd",post)
   if (!post) return notFound();
   return post
 }
+
+
+
 
 // export const getPost = unstable_cache(
 //   async (slug) => {
@@ -99,8 +101,21 @@ export async function getPost(slug) {
 //   }
 // );
 
-
-
+// On crée une SA identique à getPost, afin de pouvoir revalider seulement revalider getPost quand on edit, ce qui évite de revalider potentiellement getPost qu'on utilise dans la page d'edit, ce qui produirait une 404
+export async function getPostForEdit(slug) {
+  await connectToDB();
+  const post = await Post.findOne({ slug })
+    .populate({
+      path: "author", // Enrichit l'objet `author`
+      select: "userName normalizedUserName", // Inclut les champs nécessaires depuis User
+    })
+    .populate({
+      path: "tags",
+      select: "name slug", // Inclut le champ `name` depuis Tag
+    })
+  if (!post) return notFound();
+  return post
+}
 
 
 
